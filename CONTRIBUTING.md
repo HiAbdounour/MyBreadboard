@@ -4,13 +4,14 @@ Merci de votre intérêt pour MyBreadboard ! Ce document décrit comment prépar
 
 ## Présentation du projet
 
-MyBreadboard est une application de bureau Windows développée en C# avec WPF et XAML. L’application permet de dessiner des schémas électriques simples. Les fils sont des éléments visuels : ils ne représentent pas de connexions électriques.
+MyBreadboard est une application de bureau Windows développée en C# avec WPF et XAML. L’application permet de dessiner des schémas électriques simples.\
+**ATTENTION !** Les fils sont des éléments visuels : ils ne représentent pas de connexions électriques.
 
 ## Prérequis
 
-- Windows 10 ou Windows 11. WPF nécessite Windows.
-- Git.
-- Le SDK .NET 8.
+- Windows 10 ou Windows 11. WPF nécessite Windows
+- Git
+- Le SDK .NET 8
 - Au choix :
   - Visual Studio 2022 avec la charge de travail **Développement .NET Desktop** ; ou
   - PowerShell ou un terminal Windows avec le SDK .NET installé.
@@ -50,19 +51,20 @@ dotnet build .\MyBreadboard.sln
 dotnet run --project .\src\MyBreadboard.App\MyBreadboard.App.csproj
 ```
 
+Avec Visual Studio, ouvrez `MyBreadboard.sln`, restaurez les dépendances, puis lancez l’application avec **F5**.
+
+*Réserver au déploiement:*\
 Pour compiler une version Release :
 
 ```powershell
 dotnet build .\MyBreadboard.sln --configuration Release
 ```
 
-Avec Visual Studio, ouvrez `MyBreadboard.sln`, laissez Visual Studio restaurer les dépendances, puis lancez l’application avec **F5**.
-
 ## Vérifications avant de proposer un changement
 
 1. Compilez la solution avec `dotnet build .\MyBreadboard.sln`.
 2. Lancez l’application et vérifiez manuellement les fonctionnalités concernées. Pour les changements d’interface, contrôlez notamment les interactions souris et clavier.
-3. Si votre changement touche aux fichiers `.mybrd`, testez l’enregistrement puis la réouverture d’un schéma, y compris les cas pertinents de compatibilité.
+3. Si votre changement touche aux fichiers `.mybrd`, testez l’enregistrement puis la réouverture d’un schéma, y compris les cas pertinents de compatibilité avec les anciennes versions.
 4. Examinez votre diff et retirez les fichiers générés, les modifications sans rapport et les traces de débogage.
 
 La solution actuelle ne contient pas de projet de tests automatisés. Si vous ajoutez des tests, documentez leur exécution et gardez-les reproductibles.
@@ -70,19 +72,20 @@ La solution actuelle ne contient pas de projet de tests automatisés. Si vous aj
 ## Bonnes pratiques de contribution
 
 - Vérifiez d’abord les issues et discussions existantes pour éviter les doublons. Pour un changement important, ouvrez une issue ou discutez de l’approche avant de commencer.
+- Attribuez-vous l'issue que vous essayez de résolver (si applicable).
 - Gardez chaque contribution ciblée et de taille raisonnable.
 - Respectez les conventions déjà présentes dans le code : C#, WPF/XAML, espaces de noms existants et annotations de nullabilité.
-- Évitez d’ajouter une dépendance si la plateforme ou le framework fournit déjà une solution adaptée.
+- Évitez d’ajouter une dépendance si la plateforme ou le framework fournit déjà une solution adaptée. Le but est de rester simple et minimaliste.
 - Mettez à jour la documentation lorsqu’un changement modifie le comportement ou les instructions d’utilisation.
-- N’introduisez pas dans les données du schéma une signification électrique que l’application ne prend pas encore en charge ; les fils actuels sont uniquement visuels.
+- N’introduisez pas dans les données du schéma une signification électrique : l'outil ne sert qu'à dessiner des schémas électriques, pas à les modéliser ni à les simuler.
 
 ## Utilisation d’outils d’intelligence artificielle
 
-L’utilisation d’outils d’IA est acceptée pour contribuer au projet, mais elle ne remplace ni la compréhension du code ni la responsabilité du contributeur. Vous devez comprendre les changements que vous proposez et vérifier attentivement tout code, texte ou autre contenu généré ou suggéré par l’IA avant de l’inclure dans une pull request.
+L’utilisation d’outils d’intelligence artificielle est acceptée pour contribuer au projet, mais elle ne remplace ni la compréhension du code ni la responsabilité du contributeur. Vous devez comprendre les changements que vous proposez et vérifier attentivement tout code, texte ou autre contenu généré ou suggéré par l’IA avant de l’inclure dans une pull request.
 
 Ne soumettez pas de contenu que vous ne pouvez pas expliquer, maintenir ou défendre en revue. Vérifiez notamment la compilation, le comportement, la sécurité, les dépendances introduites et la cohérence avec les conventions et objectifs du projet.
 
-Si vous avez utilisé l’IA, indiquez-le dans la pull request et expliquez clairement les apports : ce qui a été généré ou assisté, comment vous l’avez vérifié, et les tests ou vérifications que vous avez effectués. La description de la pull request doit permettre aux mainteneurs de comprendre le changement et ses choix, indépendamment de l’outil utilisé.
+La description de votre pull request doit permettre aux mainteneurs de comprendre le changement et ses choix, indépendamment de l’outil utilisé, mais également de démontrer votre maîtrise et la vérification du code que vous soumettez.
 
 ## Commits et pull requests
 
@@ -93,17 +96,18 @@ Add annotation text editing
 Fix document save path handling
 Document local setup
 ```
+Il est préférable que le commit soit rédigé en anglais.
 
 Avant d’ouvrir une pull request :
 
-- vérifiez que la branche est à jour avec la branche par défaut ;
-- vérifiez que la solution compile ;
-- fournissez un résumé du changement et sa motivation ;
-- indiquez les vérifications manuelles ou automatisées effectuées ;
-- ajoutez des captures d’écran pour les changements d’interface lorsque cela aide à les comprendre ;
-- signalez explicitement les limitations ou les tâches de suivi.
+- Vérifiez que la branche est à jour avec la branche par défaut ;
+- Vérifiez que la solution compile ;
+- Fournissez un résumé du changement et sa motivation ;
+- Indiquez les vérifications manuelles ou automatisées effectuées ;
+- Signalez explicitement les limitations ou les tâches de suivi.
 
-Une pull request doit se concentrer sur un sujet. Les retours de revue peuvent nécessiter des ajustements avant l’intégration.
+Une pull request doit se concentrer sur un sujet. Les retours de revue peuvent nécessiter des ajustements avant l’intégration.\
+Pensez à décorer votre pull request avec des labels adéquats.
 
 ## Signaler un problème
 
