@@ -209,7 +209,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private static void FinishAnnotationEdit(TextBox editor, bool commit)
+    private void FinishAnnotationEdit(TextBox editor, bool commit)
     {
         if (editor.Tag is not Border annotation || !ReferenceEquals(annotation.Child, editor))
         {
