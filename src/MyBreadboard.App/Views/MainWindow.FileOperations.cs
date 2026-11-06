@@ -6,6 +6,8 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using MyBreadboard.App.Models;
+using WpfPoint = System.Windows.Point;
+using IOPath = System.IO.Path;
 
 namespace MyBreadboard.App.Views;
 
@@ -105,7 +107,7 @@ public partial class MainWindow
             File.WriteAllText(path, json);
             _currentFilePath = path;
             UpdateWindowTitle();
-            EditorStatus.Text = $"Schéma enregistré : {Path.GetFileName(path)}";
+            EditorStatus.Text = $"Schéma enregistré : {IOPath.GetFileName(path)}";
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException)
         {
@@ -201,7 +203,7 @@ public partial class MainWindow
             ApplyDocument(document);
             _currentFilePath = dialog.FileName;
             UpdateWindowTitle();
-            EditorStatus.Text = $"Schéma ouvert : {Path.GetFileName(dialog.FileName)}";
+            EditorStatus.Text = $"Schéma ouvert : {IOPath.GetFileName(dialog.FileName)}";
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException or InvalidDataException)
         {
@@ -265,7 +267,7 @@ public partial class MainWindow
             var component = (Border)DrawingSurface.Children[^1];
             component.Width = savedComponent.Width;
             component.Height = savedComponent.Height;
-            component.RenderTransformOrigin = new Point(0.5, 0.5);
+            component.RenderTransformOrigin = new WpfPoint(0.5, 0.5);
             component.RenderTransform = new RotateTransform(NormalizeAngle(savedComponent.Rotation));
         }
 
@@ -285,7 +287,7 @@ public partial class MainWindow
 
             foreach (var point in savedWire.Points)
             {
-                wire.Points.Add(new Point(point.X, point.Y));
+                wire.Points.Add(new WpfPoint(point.X, point.Y));
             }
 
             wire.MouseLeftButtonDown += Wire_MouseLeftButtonDown;
@@ -300,7 +302,7 @@ public partial class MainWindow
     {
         Title = string.IsNullOrWhiteSpace(_currentFilePath)
             ? "My Breadboard"
-            : $"My Breadboard — {Path.GetFileName(_currentFilePath)}";
+            : $"My Breadboard — {IOPath.GetFileName(_currentFilePath)}";
     }
 
     private static double NormalizeAngle(double angle)
