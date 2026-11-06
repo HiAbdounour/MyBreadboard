@@ -1,6 +1,6 @@
 # MyBreadboard
 
-**Dessinez vos idées de circuits électriques simplement.** MyBreadboard est une application Windows légère pour composer des schémas visuels, annoter les éléments, organiser le dessin et enregistrer votre travail dans un fichier réutilisable.
+**Dessinez vos idées de circuits électriques simplement.** MyBreadboard est une application Windows légère pour composer des schémas visuels, annoter des éléments et représenter des schémas électriques simples.
 
 ## État du projet et fonctionnalités
 
@@ -8,24 +8,29 @@ MyBreadboard est un prototype fonctionnel destiné au dessin de schémas électr
 
 ### Fonctionnalités disponibles
 
-- Ajouter des symboles : générateurs de tension et de courant, résistance, interrupteur, diode, LED, bouton poussoir et annotation.
+- Ajouter des symboles : les symboles actuellement supportés sont : générateurs de tension et de courant, résistance, interrupteur, diode, LED, bouton poussoir et annotation.
 - Sélectionner les objets, les déplacer sur la feuille et supprimer l’objet sélectionné via le menu contextuel ou la touche **Suppr**.
 - Faire pivoter le composant sélectionné de 90° avec **Espace**.
-- Créer des fils horizontaux ou verticaux avec le bouton Fil ou la touche **W** ; quitter le mode fil avec **Échap**.
+- Créer des fils horizontaux ou verticaux avec le bouton Fil ou la touche **W** ; quitter le mode fil avec **Échap** ou **W**.
 - Ajouter et modifier le texte d’une annotation par double-clic. Les annotations peuvent aussi être déplacées et supprimées comme les autres objets.
-- Créer un nouveau schéma, ouvrir et enregistrer des documents `.mybrd`. Les fichiers enregistrent les composants, leurs positions, dimensions et rotations, le texte des annotations ainsi que les tracés de fils.
-- Utiliser **Ctrl+N**, **Ctrl+O** et **Ctrl+S** pour Nouveau, Ouvrir et Enregistrer.
+- Créer un nouveau schéma, ouvrir et enregistrer des documents au format `.mybrd`. Les fichiers enregistrent les composants, leurs positions, dimensions et rotations, le texte des annotations ainsi que les tracés de fils.
+- Utiliser **Ctrl+N**, **Ctrl+O** et **Ctrl+S** respectivement pour Nouveau, Ouvrir et Enregistrer.
 
 ### Limitations connues
 
 - **Copier, coller et Tout sélectionner** sont présents, mais ne sont pas encore fiables à 100 % ; leur comportement peut être incomplet ou inattendu.
-- **Le zoom n’est pas implémenté.**
-- Les fils sont uniquement des traits visuels : ils ne modélisent pas de connexions électriques et ne permettent pas de simulation de circuit. Leur tracé est limité aux segments horizontaux et verticaux.
-- Le projet est un prototype en évolution et certaines interactions peuvent encore nécessiter des améliorations.
+- **Le zoom n’est pas implémenté bien que présent dans le menu du haut.**
+- Certaines interactions peuvent nécessiter des améliorations.
+- De nombreux composants simples manquent.
+- Certains symboles, en particulier ceux du bouton poussoir et de la LED, sont à revoir.
+
+### Non-implémentations
+MyBreadboard est un outil de représentation visuelle de circuits électriques. Il n'est pas conçu pour réaliser des simulations.\
+De même, les composants jugés trop complexes seront refusés.
 
 ## Prérequis
 
-- Windows 10 ou Windows 11 (WPF ne fonctionne que sous Windows).
+- Windows 10 ou Windows 11 (WPF ne fonctionne que sur Windows).
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
 - Visual Studio 2022 avec la charge de travail **Développement .NET Desktop** (facultatif si vous utilisez la ligne de commande).
 
