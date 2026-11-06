@@ -51,6 +51,9 @@ public partial class MainWindow
         {
             switch (item.Header?.ToString())
             {
+                case "Nouveau":
+                    item.Click += NewDocument_Click;
+                    break;
                 case "Ouvrir":
                     item.Click += OpenDocument_Click;
                     break;
@@ -63,6 +66,44 @@ public partial class MainWindow
         _fileMenuHandlersAttached = true;
     }
 
+    private void NewDocument_Click(object sender, RoutedEventArgs e)
+    {
+        if (_activeWire is not null)
+        {
+            FinishActiveWire();
+        }
+
+        if (DrawingSurface.Children.Count > 0)
+        {
+            var result = MessageBox.Show(this,
+                "Enregistrer le schéma actuel avant de créer un nouveau document ?",
+                "Nouveau document",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Cancel ||
+                (result == MessageBoxResult.Yes && !SaveDocument()))
+            {
+                return;
+            }
+        }
+
+        SelectElement(null);
+        DrawingSurface.Children.Clear();
+        _selectedElement = null;
+        _draggedElement = null;
+        _activeWire = null;
+        _wireOrientation = null;
+        if (DrawingSurface.IsMouseCaptured)
+        {
+            DrawingSurface.ReleaseMouseCapture();
+        }
+
+        _currentFilePath = null;
+        UpdateWindowTitle();
+        EditorStatus.Text = "Nouveau schéma : placez des composants ou appuyez sur W pour tracer un fil.";
+    }
+
     private void SaveDocument_Click(object sender, RoutedEventArgs e)
     {
         SaveDocument();
@@ -73,7 +114,7 @@ public partial class MainWindow
         OpenDocument();
     }
 
-    private void SaveDocument()
+    private bool SaveDocument()
     {
         if (_activeWire is not null)
         {
@@ -94,7 +135,7 @@ public partial class MainWindow
 
             if (dialog.ShowDialog(this) != true)
             {
-                return;
+                return false;
             }
 
             path = dialog.FileName;
@@ -108,6 +149,7 @@ public partial class MainWindow
             _currentFilePath = path;
             UpdateWindowTitle();
             EditorStatus.Text = $"Schéma enregistré : {IOPath.GetFileName(path)}";
+            return true;
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException)
         {
@@ -116,6 +158,7 @@ public partial class MainWindow
                 "Erreur d'enregistrement",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
+            return false;
         }
     }
 
