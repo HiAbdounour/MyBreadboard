@@ -10,7 +10,6 @@ namespace MyBreadboard.App.Views;
 public partial class MainWindow : Window
 {
     private static readonly Brush SelectionBrush = new SolidColorBrush(Color.FromRgb(104, 66, 166));
-    private const double WireThickness = 6;
 
     private FrameworkElement? _selectedElement;
     private FrameworkElement? _draggedElement;
@@ -21,10 +20,6 @@ public partial class MainWindow : Window
     private double _dragOriginTop;
     private Orientation? _wireOrientation;
     private bool _isWireMode;
-    private Brush? _selectedOriginalBorderBrush;
-    private Thickness _selectedOriginalBorderThickness;
-    private Brush? _selectedOriginalStroke;
-    private double _selectedOriginalStrokeThickness;
 
     public MainWindow()
     {
@@ -54,6 +49,7 @@ public partial class MainWindow : Window
         _isWireMode = enabled;
         if (!enabled)
         {
+            // Leaving wire mode keeps any completed portion of the current stroke.
             FinishActiveWire();
         }
 
@@ -183,15 +179,6 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
-    private void Wire_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        if (!_isWireMode && sender is FrameworkElement wire)
-        {
-            SelectElement(wire);
-            e.Handled = true;
-        }
-    }
-
     private void DrawingSurface_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         if (_isWireMode)
@@ -224,20 +211,18 @@ public partial class MainWindow : Window
         _activeWire = new Polyline
         {
             Stroke = Brushes.Black,
-            StrokeThickness = WireThickness,
+            StrokeThickness = 2,
             StrokeStartLineCap = PenLineCap.Round,
             StrokeEndLineCap = PenLineCap.Round,
             StrokeLineJoin = PenLineJoin.Round,
-            IsHitTestVisible = true,
-            Tag = "Wire",
-            ContextMenu = CreateObjectContextMenu()
+            IsHitTestVisible = false
         };
         _activeWire.Points.Add(startPoint);
         _activeWire.Points.Add(startPoint);
-        _activeWire.MouseLeftButtonDown += Wire_MouseLeftButtonDown;
-        _activeWire.MouseRightButtonDown += SelectForContextMenu;
         DrawingSurface.Children.Add(_activeWire);
 
+        // Capture between clicks so the active wire continues to follow the pointer
+        // after the initial click has been released.
         DrawingSurface.CaptureMouse();
         EditorStatus.Text = "Fil en cours : déplacez la souris, puis cliquez pour terminer ce fil.";
     }
@@ -275,6 +260,7 @@ public partial class MainWindow : Window
         var deltaX = pointer.X - _wireStart.X;
         var deltaY = pointer.Y - _wireStart.Y;
 
+        // The first meaningful movement locks the wire to one axis for its whole length.
         if (_wireOrientation is null && (Math.Abs(deltaX) > 0.1 || Math.Abs(deltaY) > 0.1))
         {
             _wireOrientation = Math.Abs(deltaX) >= Math.Abs(deltaY)
@@ -290,6 +276,8 @@ public partial class MainWindow : Window
         var endpoint = _wireOrientation == Orientation.Horizontal
             ? new Point(pointer.X, _wireStart.Y)
             : new Point(_wireStart.X, pointer.Y);
+
+        // Only one coordinate changes: the rendered segment can never be diagonal.
         _activeWire.Points[1] = endpoint;
     }
 
@@ -315,6 +303,8 @@ public partial class MainWindow : Window
 
     private void DrawingSurface_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+        // Wire drawing is click-to-start, move-to-draw, click-to-finish. Releasing
+        // the first click must not finish the wire; the next left click does that.
         if (_activeWire is not null)
         {
             UpdateActiveWire(e.GetPosition(DrawingSurface));
@@ -355,7 +345,7 @@ public partial class MainWindow : Window
             SetWireMode(!_isWireMode);
             e.Handled = true;
         }
-        else if (e.Key == Key.Delete)
+        else if (e.Key == Key.Delete && !_isWireMode)
         {
             DeleteSelected();
             e.Handled = true;
@@ -385,44 +375,29 @@ public partial class MainWindow : Window
 
     private void SelectElement(FrameworkElement? element)
     {
-        if (ReferenceEquals(_selectedElement, element))
+        if (_selectedElement is Border selectedBorder && selectedBorder != element)
         {
-            return;
+            selectedBorder.BorderBrush = Brushes.Transparent;
+            selectedBorder.BorderThickness = new Thickness(2);
         }
 
-        RestoreSelectedAppearance();
+        if (_selectedElement is Shape selectedShape && selectedShape != element)
+        {
+            selectedShape.Stroke = Brushes.Black;
+            selectedShape.StrokeThickness = 2;
+        }
+
         _selectedElement = element;
 
         if (element is Border border)
         {
-            _selectedOriginalBorderBrush = border.BorderBrush;
-            _selectedOriginalBorderThickness = border.BorderThickness;
             border.BorderBrush = SelectionBrush;
             border.BorderThickness = new Thickness(3);
         }
         else if (element is Shape shape)
         {
-            _selectedOriginalStroke = shape.Stroke;
-            _selectedOriginalStrokeThickness = shape.StrokeThickness;
             shape.Stroke = SelectionBrush;
-            shape.StrokeThickness = Math.Max(shape.StrokeThickness + 2, 8);
+            shape.StrokeThickness = 4;
         }
-    }
-
-    private void RestoreSelectedAppearance()
-    {
-        if (_selectedElement is Border border)
-        {
-            border.BorderBrush = _selectedOriginalBorderBrush ?? Brushes.Transparent;
-            border.BorderThickness = _selectedOriginalBorderThickness;
-        }
-        else if (_selectedElement is Shape shape)
-        {
-            shape.Stroke = _selectedOriginalStroke ?? Brushes.Black;
-            shape.StrokeThickness = _selectedOriginalStrokeThickness;
-        }
-
-        _selectedOriginalBorderBrush = null;
-        _selectedOriginalStroke = null;
     }
 }
