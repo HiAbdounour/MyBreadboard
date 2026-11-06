@@ -26,37 +26,22 @@ public partial class MainWindow : Window
     private Brush? _selectedOriginalStroke;
     private double _selectedOriginalStrokeThickness;
 
-    public MainWindow()
-    {
-        InitializeComponent();
-    }
+    public MainWindow() => InitializeComponent();
 
     private void AddComponentButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button button)
-        {
-            return;
-        }
-
+        if (sender is not Button button) return;
         var type = button.Tag?.ToString() ?? "Composant";
-        var x = 120 + (DrawingSurface.Children.Count * 18) % 500;
-        var y = 140 + (DrawingSurface.Children.Count * 20) % 280;
-        AddComponentToCanvas(type, x, y);
+        AddComponentToCanvas(type, 120 + (DrawingSurface.Children.Count * 18) % 500,
+            140 + (DrawingSurface.Children.Count * 20) % 280);
     }
 
-    private void WireToolButton_Click(object sender, RoutedEventArgs e)
-    {
-        SetWireMode(!_isWireMode);
-    }
+    private void WireToolButton_Click(object sender, RoutedEventArgs e) => SetWireMode(!_isWireMode);
 
     private void SetWireMode(bool enabled)
     {
         _isWireMode = enabled;
-        if (!enabled)
-        {
-            FinishActiveWire();
-        }
-
+        if (!enabled) FinishActiveWire();
         EditorStatus.Text = enabled
             ? "Mode fil actif : cliquez pour commencer un fil, déplacez la souris pour choisir son axe, puis cliquez à nouveau pour le terminer. W pour quitter."
             : "Sélection : cliquez sur un objet. Fil : appuyez sur W pour activer le mode.";
@@ -68,33 +53,22 @@ public partial class MainWindow : Window
     {
         var border = new Border
         {
-            Width = 120,
-            Height = 72,
-            Background = Brushes.Transparent,
-            BorderBrush = Brushes.Transparent,
-            BorderThickness = new Thickness(2),
-            Tag = type,
-            ToolTip = type,
-            Child = CreateComponentVisual(type)
+            Width = 120, Height = 72, Background = Brushes.Transparent,
+            BorderBrush = Brushes.Transparent, BorderThickness = new Thickness(2),
+            Tag = type, ToolTip = type, Child = CreateComponentVisual(type)
         };
-
         Canvas.SetLeft(border, x);
         Canvas.SetTop(border, y);
         border.MouseLeftButtonDown += Component_MouseLeftButtonDown;
         border.MouseRightButtonDown += SelectForContextMenu;
         border.ContextMenu = CreateObjectContextMenu();
-
         DrawingSurface.Children.Add(border);
         SelectElement(border);
     }
 
     private static FrameworkElement CreateComponentVisual(string type)
     {
-        if (type == "Annotation")
-        {
-            return CreateAnnotationTextBlock("T");
-        }
-
+        if (type == "Annotation") return CreateAnnotationTextBlock("T");
         var geometry = type switch
         {
             "Générateur de tension" => "M2,21 H24 M62,21 H84 M24,21 A19,19 0 1 1 62,21 A19,19 0 1 1 24,21 M36,12 L51,21 L36,30",
@@ -106,73 +80,39 @@ public partial class MainWindow : Window
             "Bouton poussoir" => "M2,12 H16 M70,12 H84 M2,32 H16 M70,32 H84 M16,4 H70 V40 H16 Z M31,12 L42,23 M55,32 L44,21 M31,12 V17 M55,27 V32",
             _ => "M4,21 H82"
         };
-
         var symbolCanvas = new Canvas { Width = 86, Height = 42 };
         symbolCanvas.Children.Add(new System.Windows.Shapes.Path
         {
-            Data = Geometry.Parse(geometry),
-            Stroke = Brushes.Black,
-            StrokeThickness = 3.5,
-            StrokeStartLineCap = PenLineCap.Round,
-            StrokeEndLineCap = PenLineCap.Round,
+            Data = Geometry.Parse(geometry), Stroke = Brushes.Black, StrokeThickness = 3.5,
+            StrokeStartLineCap = PenLineCap.Round, StrokeEndLineCap = PenLineCap.Round,
             StrokeLineJoin = PenLineJoin.Round,
             Fill = type is "Diode" or "LED" ? Brushes.White : Brushes.Transparent
         });
-
         if (type == "LED")
-        {
             symbolCanvas.Children.Add(new System.Windows.Shapes.Path
             {
-                Data = Geometry.Parse("M63,0 L66,-3 L65,2 M74,4 L77,1 L76,6"),
-                Fill = Brushes.Black
+                Data = Geometry.Parse("M63,0 L66,-3 L65,2 M74,4 L77,1 L76,6"), Fill = Brushes.Black
             });
-        }
-
-        return new Viewbox
-        {
-            Stretch = Stretch.Uniform,
-            Margin = new Thickness(4),
-            Child = symbolCanvas
-        };
+        return new Viewbox { Stretch = Stretch.Uniform, Margin = new Thickness(4), Child = symbolCanvas };
     }
 
-    private static TextBlock CreateAnnotationTextBlock(string text)
+    private static TextBlock CreateAnnotationTextBlock(string text) => new()
     {
-        return new TextBlock
-        {
-            Text = text,
-            FontFamily = new FontFamily("Georgia"),
-            FontSize = text.Length <= 2 ? 48 : 22,
-            Foreground = Brushes.Black,
-            TextWrapping = TextWrapping.Wrap,
-            TextAlignment = TextAlignment.Center,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            VerticalAlignment = VerticalAlignment.Center
-        };
-    }
+        Text = text, FontFamily = new FontFamily("Georgia"), FontSize = text.Length <= 2 ? 48 : 22,
+        Foreground = Brushes.Black, TextWrapping = TextWrapping.Wrap, TextAlignment = TextAlignment.Center,
+        HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Center
+    };
 
     private void BeginAnnotationEdit(Border annotation)
     {
-        if (annotation.Child is not TextBlock currentText)
-        {
-            return;
-        }
-
+        if (annotation.Child is not TextBlock currentText) return;
         var editor = new TextBox
         {
-            Text = currentText.Text,
-            FontFamily = currentText.FontFamily,
-            FontSize = 22,
-            Foreground = Brushes.Black,
-            Background = Brushes.Transparent,
-            BorderThickness = new Thickness(0),
-            Padding = new Thickness(2),
-            TextWrapping = TextWrapping.Wrap,
-            AcceptsReturn = true,
+            Text = currentText.Text, FontFamily = currentText.FontFamily, FontSize = 22,
+            Foreground = Brushes.Black, Background = Brushes.Transparent, BorderThickness = new Thickness(0),
+            Padding = new Thickness(2), TextWrapping = TextWrapping.Wrap, AcceptsReturn = true,
             HorizontalContentAlignment = HorizontalAlignment.Center,
-            VerticalContentAlignment = VerticalAlignment.Center,
-            Tag = annotation,
-            ToolTip = currentText.Text
+            VerticalContentAlignment = VerticalAlignment.Center, Tag = annotation, ToolTip = currentText.Text
         };
         editor.LostKeyboardFocus += AnnotationEditor_LostKeyboardFocus;
         editor.PreviewKeyDown += AnnotationEditor_PreviewKeyDown;
@@ -184,11 +124,7 @@ public partial class MainWindow : Window
 
     private void AnnotationEditor_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (sender is not TextBox editor)
-        {
-            return;
-        }
-
+        if (sender is not TextBox editor) return;
         if (e.Key == Key.Enter && !Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
         {
             FinishAnnotationEdit(editor, commit: true);
@@ -201,21 +137,15 @@ public partial class MainWindow : Window
         }
     }
 
-    private void AnnotationEditor_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+    // This handler only calls static logic, so it can be unsubscribed by the static editor finalizer.
+    private static void AnnotationEditor_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
     {
-        if (sender is TextBox editor)
-        {
-            FinishAnnotationEdit(editor, commit: true);
-        }
+        if (sender is TextBox editor) FinishAnnotationEdit(editor, commit: true);
     }
 
     private static void FinishAnnotationEdit(TextBox editor, bool commit)
     {
-        if (editor.Tag is not Border annotation || !ReferenceEquals(annotation.Child, editor))
-        {
-            return;
-        }
-
+        if (editor.Tag is not Border annotation || !ReferenceEquals(annotation.Child, editor)) return;
         editor.LostKeyboardFocus -= AnnotationEditor_LostKeyboardFocus;
         editor.PreviewKeyDown -= AnnotationEditor_PreviewKeyDown;
         annotation.Child = CreateAnnotationTextBlock(commit ? editor.Text : editor.ToolTip as string ?? string.Empty);
@@ -225,8 +155,7 @@ public partial class MainWindow : Window
     {
         var contextMenu = new ContextMenu
         {
-            Background = new SolidColorBrush(Color.FromRgb(42, 42, 42)),
-            Foreground = Brushes.White
+            Background = new SolidColorBrush(Color.FromRgb(42, 42, 42)), Foreground = Brushes.White
         };
         var deleteItem = new MenuItem { Header = "Supprimer" };
         deleteItem.Click += DeleteSelected_Click;
@@ -236,25 +165,12 @@ public partial class MainWindow : Window
 
     private void SelectForContextMenu(object sender, MouseButtonEventArgs e)
     {
-        if (sender is FrameworkElement element)
-        {
-            SelectElement(element);
-        }
+        if (sender is FrameworkElement element) SelectElement(element);
     }
 
     private void Component_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (_isWireMode || sender is not Border element)
-        {
-            return;
-        }
-
-        // The text box handles pointer interaction while annotation editing is active.
-        if (e.OriginalSource is TextBoxBase)
-        {
-            return;
-        }
-
+        if (_isWireMode || sender is not Border element || e.OriginalSource is TextBoxBase) return;
         if (string.Equals(element.Tag?.ToString(), "Annotation", StringComparison.Ordinal) && e.ClickCount == 2)
         {
             SelectElement(element);
@@ -262,7 +178,6 @@ public partial class MainWindow : Window
             e.Handled = true;
             return;
         }
-
         SelectElement(element);
         _draggedElement = element;
         _dragStart = e.GetPosition(DrawingSurface);
@@ -286,24 +201,12 @@ public partial class MainWindow : Window
         if (_isWireMode)
         {
             var position = e.GetPosition(DrawingSurface);
-            if (_activeWire is null)
-            {
-                StartWire(position);
-            }
-            else
-            {
-                UpdateActiveWire(position);
-                FinishActiveWire();
-            }
-
+            if (_activeWire is null) StartWire(position);
+            else { UpdateActiveWire(position); FinishActiveWire(); }
             e.Handled = true;
             return;
         }
-
-        if (e.Source == DrawingSurface)
-        {
-            SelectElement(null);
-        }
+        if (e.Source == DrawingSurface) SelectElement(null);
     }
 
     private void StartWire(Point startPoint)
@@ -312,14 +215,10 @@ public partial class MainWindow : Window
         _wireOrientation = null;
         _activeWire = new Polyline
         {
-            Stroke = Brushes.Black,
-            StrokeThickness = WireThickness,
-            StrokeStartLineCap = PenLineCap.Round,
-            StrokeEndLineCap = PenLineCap.Round,
-            StrokeLineJoin = PenLineJoin.Round,
-            IsHitTestVisible = true,
-            Tag = "Wire",
-            ContextMenu = CreateObjectContextMenu()
+            Stroke = Brushes.Black, StrokeThickness = WireThickness,
+            StrokeStartLineCap = PenLineCap.Round, StrokeEndLineCap = PenLineCap.Round,
+            StrokeLineJoin = PenLineJoin.Round, IsHitTestVisible = true,
+            Tag = "Wire", ContextMenu = CreateObjectContextMenu()
         };
         _activeWire.Points.Add(startPoint);
         _activeWire.Points.Add(startPoint);
@@ -337,12 +236,7 @@ public partial class MainWindow : Window
             UpdateActiveWire(e.GetPosition(DrawingSurface));
             return;
         }
-
-        if (_draggedElement is null || !DrawingSurface.IsMouseCaptured)
-        {
-            return;
-        }
-
+        if (_draggedElement is null || !DrawingSurface.IsMouseCaptured) return;
         var currentPosition = e.GetPosition(DrawingSurface);
         var deltaX = currentPosition.X - _dragStart.X;
         var deltaY = currentPosition.Y - _dragStart.Y;
@@ -354,25 +248,12 @@ public partial class MainWindow : Window
 
     private void UpdateActiveWire(Point pointer)
     {
-        if (_activeWire is null)
-        {
-            return;
-        }
-
+        if (_activeWire is null) return;
         var deltaX = pointer.X - _wireStart.X;
         var deltaY = pointer.Y - _wireStart.Y;
         if (_wireOrientation is null && (Math.Abs(deltaX) > 0.1 || Math.Abs(deltaY) > 0.1))
-        {
-            _wireOrientation = Math.Abs(deltaX) >= Math.Abs(deltaY)
-                ? Orientation.Horizontal
-                : Orientation.Vertical;
-        }
-
-        if (_wireOrientation is null)
-        {
-            return;
-        }
-
+            _wireOrientation = Math.Abs(deltaX) >= Math.Abs(deltaY) ? Orientation.Horizontal : Orientation.Vertical;
+        if (_wireOrientation is null) return;
         _activeWire.Points[1] = _wireOrientation == Orientation.Horizontal
             ? new Point(pointer.X, _wireStart.Y)
             : new Point(_wireStart.X, pointer.Y);
@@ -380,32 +261,16 @@ public partial class MainWindow : Window
 
     private void FinishActiveWire()
     {
-        if (_activeWire is null)
-        {
-            return;
-        }
-
+        if (_activeWire is null) return;
         _activeWire = null;
         _wireOrientation = null;
-        if (DrawingSurface.IsMouseCaptured)
-        {
-            DrawingSurface.ReleaseMouseCapture();
-        }
-
-        if (_isWireMode)
-        {
-            EditorStatus.Text = "Mode fil actif : cliquez pour commencer un nouveau fil.";
-        }
+        if (DrawingSurface.IsMouseCaptured) DrawingSurface.ReleaseMouseCapture();
+        if (_isWireMode) EditorStatus.Text = "Mode fil actif : cliquez pour commencer un nouveau fil.";
     }
 
     private void DrawingSurface_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (_activeWire is not null)
-        {
-            UpdateActiveWire(e.GetPosition(DrawingSurface));
-            return;
-        }
-
+        if (_activeWire is not null) { UpdateActiveWire(e.GetPosition(DrawingSurface)); return; }
         if (_draggedElement is not null)
         {
             _draggedElement = null;
@@ -415,75 +280,37 @@ public partial class MainWindow : Window
 
     private void DrawingSurface_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (_activeWire is not null)
-        {
-            DrawingSurface.Children.Remove(_activeWire);
-            _activeWire = null;
-            _wireOrientation = null;
-            if (DrawingSurface.IsMouseCaptured)
-            {
-                DrawingSurface.ReleaseMouseCapture();
-            }
-            e.Handled = true;
-        }
+        if (_activeWire is null) return;
+        DrawingSurface.Children.Remove(_activeWire);
+        _activeWire = null;
+        _wireOrientation = null;
+        if (DrawingSurface.IsMouseCaptured) DrawingSurface.ReleaseMouseCapture();
+        e.Handled = true;
     }
 
     private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (Keyboard.FocusedElement is TextBoxBase)
-        {
-            return;
-        }
-
-        if (e.Key == Key.W)
-        {
-            SetWireMode(!_isWireMode);
-            e.Handled = true;
-        }
-        else if (e.Key == Key.Delete)
-        {
-            DeleteSelected();
-            e.Handled = true;
-        }
-        else if (e.Key == Key.Escape && _isWireMode)
-        {
-            SetWireMode(false);
-            e.Handled = true;
-        }
+        if (Keyboard.FocusedElement is TextBoxBase) return;
+        if (e.Key == Key.W) { SetWireMode(!_isWireMode); e.Handled = true; }
+        else if (e.Key == Key.Delete) { DeleteSelected(); e.Handled = true; }
+        else if (e.Key == Key.Escape && _isWireMode) { SetWireMode(false); e.Handled = true; }
     }
 
-    private void DeleteSelected_Click(object sender, RoutedEventArgs e)
-    {
-        DeleteSelected();
-    }
+    private void DeleteSelected_Click(object sender, RoutedEventArgs e) => DeleteSelected();
 
     private void DeleteSelected()
     {
-        if (_selectedElement is null)
-        {
-            return;
-        }
-
-        if (ReferenceEquals(_selectedElement, _activeWire))
-        {
-            _activeWire = null;
-            _wireOrientation = null;
-        }
-
+        if (_selectedElement is null) return;
+        if (ReferenceEquals(_selectedElement, _activeWire)) { _activeWire = null; _wireOrientation = null; }
         DrawingSurface.Children.Remove(_selectedElement);
         _selectedElement = null;
     }
 
     private void SelectElement(FrameworkElement? element)
     {
-        if (ReferenceEquals(_selectedElement, element))
-        {
-            return;
-        }
-
+        if (ReferenceEquals(_selectedElement, element)) return;
         RestoreSelectedAppearance();
         _selectedElement = element;
-
         if (element is Border border)
         {
             _selectedOriginalBorderBrush = border.BorderBrush;
@@ -512,7 +339,6 @@ public partial class MainWindow : Window
             shape.Stroke = _selectedOriginalStroke ?? Brushes.Black;
             shape.StrokeThickness = _selectedOriginalStrokeThickness;
         }
-
         _selectedOriginalBorderBrush = null;
         _selectedOriginalStroke = null;
     }
