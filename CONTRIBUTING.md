@@ -4,7 +4,7 @@ Merci de votre intérêt pour MyBreadboard ! Ce document décrit comment prépar
 
 ## Présentation du projet
 
-MyBreadboard est une application de bureau Windows développée en C# avec WPF et XAML. L’application permet de dessiner des schémas électriques simples. Les fils sont des éléments visuels : ils ne modélisent pas de connexions électriques ni de simulation de circuit.
+MyBreadboard est une application de bureau Windows développée en C# avec WPF et XAML. L’application permet de dessiner des schémas électriques simples. Les fils sont des éléments visuels : ils ne représentent pas de connexions électriques.
 
 ## Prérequis
 
@@ -75,6 +75,14 @@ La solution actuelle ne contient pas de projet de tests automatisés. Si vous aj
 - Évitez d’ajouter une dépendance si la plateforme ou le framework fournit déjà une solution adaptée.
 - Mettez à jour la documentation lorsqu’un changement modifie le comportement ou les instructions d’utilisation.
 - N’introduisez pas dans les données du schéma une signification électrique que l’application ne prend pas encore en charge ; les fils actuels sont uniquement visuels.
+
+## Utilisation d’outils d’intelligence artificielle
+
+L’utilisation d’outils d’IA est acceptée pour contribuer au projet, mais elle ne remplace ni la compréhension du code ni la responsabilité du contributeur. Vous devez comprendre les changements que vous proposez et vérifier attentivement tout code, texte ou autre contenu généré ou suggéré par l’IA avant de l’inclure dans une pull request.
+
+Ne soumettez pas de contenu que vous ne pouvez pas expliquer, maintenir ou défendre en revue. Vérifiez notamment la compilation, le comportement, la sécurité, les dépendances introduites et la cohérence avec les conventions et objectifs du projet.
+
+Si vous avez utilisé l’IA, indiquez-le dans la pull request et expliquez clairement les apports : ce qui a été généré ou assisté, comment vous l’avez vérifié, et les tests ou vérifications que vous avez effectués. La description de la pull request doit permettre aux mainteneurs de comprendre le changement et ses choix, indépendamment de l’outil utilisé.
 
 ## Commits et pull requests
 
