@@ -15,11 +15,10 @@ public partial class MainWindow : Window
     private FrameworkElement? _draggedElement;
     private Polyline? _activeWire;
     private Point _dragStart;
-    private Point _lastWirePointer;
-    private Point _wireSegmentAnchor;
-    private Orientation? _wireSegmentOrientation;
+    private Point _wireStart;
     private double _dragOriginLeft;
     private double _dragOriginTop;
+    private Orientation? _wireOrientation;
     private bool _isWireMode;
 
     public MainWindow()
@@ -48,9 +47,15 @@ public partial class MainWindow : Window
     private void SetWireMode(bool enabled)
     {
         _isWireMode = enabled;
+        if (!enabled)
+        {
+            // Leaving wire mode keeps any completed portion of the current stroke.
+            FinishActiveWire();
+        }
+
         EditorStatus.Text = enabled
-            ? "Mode fil actif : maintenez le clic gauche et déplacez la souris. Les segments restent horizontaux ou verticaux. Appuyez sur W pour quitter."
-            : "Sélection : cliquez sur un objet. Fil : appuyez sur W puis dessinez en maintenant le clic gauche.";
+            ? "Mode fil actif : cliquez pour commencer un fil, déplacez la souris pour choisir son axe, puis cliquez à nouveau pour le terminer. W pour quitter."
+            : "Sélection : cliquez sur un objet. Fil : appuyez sur W pour activer le mode.";
         Mouse.OverrideCursor = enabled ? Cursors.Pen : null;
         SelectElement(null);
     }
@@ -178,7 +183,17 @@ public partial class MainWindow : Window
     {
         if (_isWireMode)
         {
-            StartWire(e.GetPosition(DrawingSurface));
+            var position = e.GetPosition(DrawingSurface);
+            if (_activeWire is null)
+            {
+                StartWire(position);
+            }
+            else
+            {
+                UpdateActiveWire(position);
+                FinishActiveWire();
+            }
+
             e.Handled = true;
             return;
         }
@@ -191,6 +206,8 @@ public partial class MainWindow : Window
 
     private void StartWire(Point startPoint)
     {
+        _wireStart = startPoint;
+        _wireOrientation = null;
         _activeWire = new Polyline
         {
             Stroke = Brushes.Black,
@@ -201,18 +218,20 @@ public partial class MainWindow : Window
             IsHitTestVisible = false
         };
         _activeWire.Points.Add(startPoint);
-        _wireSegmentAnchor = startPoint;
-        _wireSegmentOrientation = null;
-        _lastWirePointer = startPoint;
+        _activeWire.Points.Add(startPoint);
         DrawingSurface.Children.Add(_activeWire);
+
+        // Capture between clicks so the active wire continues to follow the pointer
+        // after the initial click has been released.
         DrawingSurface.CaptureMouse();
+        EditorStatus.Text = "Fil en cours : déplacez la souris, puis cliquez pour terminer ce fil.";
     }
 
     private void DrawingSurface_MouseMove(object sender, MouseEventArgs e)
     {
         if (_activeWire is not null && DrawingSurface.IsMouseCaptured)
         {
-            ExtendOrthogonalWire(e.GetPosition(DrawingSurface));
+            UpdateActiveWire(e.GetPosition(DrawingSurface));
             return;
         }
 
@@ -231,52 +250,64 @@ public partial class MainWindow : Window
         Canvas.SetTop(_draggedElement, Math.Clamp(_dragOriginTop + deltaY, 0, maxTop));
     }
 
-    private void ExtendOrthogonalWire(Point pointer)
+    private void UpdateActiveWire(Point pointer)
     {
         if (_activeWire is null)
         {
             return;
         }
 
-        var deltaX = pointer.X - _lastWirePointer.X;
-        var deltaY = pointer.Y - _lastWirePointer.Y;
-        if (Math.Abs(deltaX) < 0.1 && Math.Abs(deltaY) < 0.1)
+        var deltaX = pointer.X - _wireStart.X;
+        var deltaY = pointer.Y - _wireStart.Y;
+
+        // The first meaningful movement locks the wire to one axis for its whole length.
+        if (_wireOrientation is null && (Math.Abs(deltaX) > 0.1 || Math.Abs(deltaY) > 0.1))
+        {
+            _wireOrientation = Math.Abs(deltaX) >= Math.Abs(deltaY)
+                ? Orientation.Horizontal
+                : Orientation.Vertical;
+        }
+
+        if (_wireOrientation is null)
         {
             return;
         }
 
-        var nextOrientation = Math.Abs(deltaX) >= Math.Abs(deltaY)
-            ? Orientation.Horizontal
-            : Orientation.Vertical;
+        var endpoint = _wireOrientation == Orientation.Horizontal
+            ? new Point(pointer.X, _wireStart.Y)
+            : new Point(_wireStart.X, pointer.Y);
 
-        if (_wireSegmentOrientation is null)
+        // Only one coordinate changes: the rendered segment can never be diagonal.
+        _activeWire.Points[1] = endpoint;
+    }
+
+    private void FinishActiveWire()
+    {
+        if (_activeWire is null)
         {
-            _wireSegmentOrientation = nextOrientation;
-            _activeWire.Points.Add(_wireSegmentAnchor);
-        }
-        else if (_wireSegmentOrientation != nextOrientation)
-        {
-            // The previous endpoint becomes a fixed corner before a segment
-            // on the other axis is started. This prevents diagonal connections.
-            _wireSegmentAnchor = _activeWire.Points[^1];
-            _wireSegmentOrientation = nextOrientation;
-            _activeWire.Points.Add(_wireSegmentAnchor);
+            return;
         }
 
-        var endpoint = _wireSegmentOrientation == Orientation.Horizontal
-            ? new Point(pointer.X, _wireSegmentAnchor.Y)
-            : new Point(_wireSegmentAnchor.X, pointer.Y);
-        _activeWire.Points[^1] = endpoint;
-        _lastWirePointer = pointer;
+        _activeWire = null;
+        _wireOrientation = null;
+        if (DrawingSurface.IsMouseCaptured)
+        {
+            DrawingSurface.ReleaseMouseCapture();
+        }
+
+        if (_isWireMode)
+        {
+            EditorStatus.Text = "Mode fil actif : cliquez pour commencer un nouveau fil.";
+        }
     }
 
     private void DrawingSurface_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+        // Wire drawing is click-to-start, move-to-draw, click-to-finish. Releasing
+        // the first click must not finish the wire; the next left click does that.
         if (_activeWire is not null)
         {
-            ExtendOrthogonalWire(e.GetPosition(DrawingSurface));
-            _activeWire = null;
-            DrawingSurface.ReleaseMouseCapture();
+            UpdateActiveWire(e.GetPosition(DrawingSurface));
             return;
         }
 
@@ -289,11 +320,15 @@ public partial class MainWindow : Window
 
     private void DrawingSurface_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (_isWireMode && _activeWire is not null)
+        if (_activeWire is not null)
         {
             DrawingSurface.Children.Remove(_activeWire);
             _activeWire = null;
-            DrawingSurface.ReleaseMouseCapture();
+            _wireOrientation = null;
+            if (DrawingSurface.IsMouseCaptured)
+            {
+                DrawingSurface.ReleaseMouseCapture();
+            }
             e.Handled = true;
         }
     }
