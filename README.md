@@ -26,6 +26,7 @@ dotnet run --project .\src\MyBreadboard.App\MyBreadboard.App.csproj
 
 Pour ouvrir le projet dans Visual Studio, ouvrez `MyBreadboard.sln`, puis lancez-le avec **F5**.
 
+
 ## Structure
 
 ```text
