@@ -6,7 +6,37 @@
         Height="800"
         WindowState="Maximized"
         Background="#111111"
-        PreviewKeyDown="Window_PreviewKeyDownWithRotation">
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <Style x:Key="DarkMenuItemStyle" TargetType="MenuItem">
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Style.Triggers>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="Background" Value="#6842A6" />
+                    <Setter Property="Foreground" Value="White" />
+                </Trigger>
+                <Trigger Property="IsSubmenuOpen" Value="True">
+                    <Setter Property="Background" Value="#6842A6" />
+                    <Setter Property="Foreground" Value="White" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="PaletteButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="112" />
+            <Setter Property="Height" Value="88" />
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="Background" Value="#D0D0D0" />
+            <Setter Property="Foreground" Value="#111111" />
+            <Setter Property="BorderBrush" Value="#777777" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -16,6 +46,13 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0" Background="#2A2A2A" Foreground="White">
+            <Menu.Resources>
+                <Style TargetType="MenuItem" BasedOn="{StaticResource DarkMenuItemStyle}" />
+                <Style TargetType="Separator">
+                    <Setter Property="Background" Value="#555555" />
+                    <Setter Property="Margin" Value="4,2" />
+                </Style>
+            </Menu.Resources>
             <MenuItem Header="Fichier">
                 <MenuItem Header="Nouveau" />
                 <MenuItem Header="Ouvrir" />
@@ -26,7 +63,7 @@
             <MenuItem Header="Édition">
                 <MenuItem Header="Copier" />
                 <MenuItem Header="Coller" />
-                <MenuItem Header="Supprimer" />
+                <MenuItem Header="Supprimer" Click="DeleteSelected_Click" />
                 <MenuItem Header="Tout sélectionner" />
             </MenuItem>
             <MenuItem Header="Affichage">
@@ -38,36 +75,100 @@
             </MenuItem>
         </Menu>
 
-        <Border Grid.Row="1" Background="#BDBDBD" Padding="12"
+        <Border Grid.Row="1" Background="#BDBDBD" Padding="8"
                 BorderBrush="#555555" BorderThickness="1">
             <WrapPanel>
-                <Button Width="60" Height="60" Margin="5" Content="⏻" FontSize="24" ToolTip="Générateur de tension" />
-                <Button Width="60" Height="60" Margin="5" Content="⊟" FontSize="24" ToolTip="Générateur de courant" />
-                <Button Width="60" Height="60" Margin="5" Content="◫" FontSize="24" ToolTip="Résistance" />
-                <Button Width="60" Height="60" Margin="5" Content="⎇" FontSize="24" ToolTip="Diode" />
-                <Button Width="60" Height="60" Margin="5" Content="◌" FontSize="24" ToolTip="LED" />
-                <Button Width="60" Height="60" Margin="5" Content="▣" FontSize="24" ToolTip="Interrupteur / bouton poussoir" />
-                <Button Width="60" Height="60" Margin="5" Content="—" FontSize="24" ToolTip="Fil" />
-                <Button Width="60" Height="60" Margin="5" Content="T" FontSize="24" ToolTip="Annotation" />
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Générateur de tension" Click="AddComponentButton_Click" ToolTip="Générateur de tension">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Path Data="M2,21 H24 M62,21 H84 M24,21 A19,19 0 1 1 62,21 A19,19 0 1 1 24,21 M36,12 L51,21 L36,30" Stroke="Black" StrokeThickness="4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent" />
+                        </Canvas>
+                        <TextBlock Text="Générateur de tension" TextWrapping="Wrap" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Générateur de courant" Click="AddComponentButton_Click" ToolTip="Générateur de courant">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Path Data="M2,21 H18 M48,21 H84 M18,21 A19,19 0 1 1 56,21 A19,19 0 1 1 18,21 M30,21 A19,19 0 1 1 68,21 A19,19 0 1 1 30,21 M38,12 L53,21 L38,30" Stroke="Black" StrokeThickness="4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent" />
+                        </Canvas>
+                        <TextBlock Text="Générateur de courant" TextWrapping="Wrap" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Résistance" Click="AddComponentButton_Click" ToolTip="Résistance">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Path Data="M2,21 H22 M22,9 H64 V33 H22 Z M64,21 H84" Stroke="Black" StrokeThickness="4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Miter" Fill="Transparent" />
+                        </Canvas>
+                        <TextBlock Text="Résistance" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Interrupteur" Click="AddComponentButton_Click" ToolTip="Interrupteur">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Path Data="M2,21 H25 M61,21 H84 M25,21 A4,4 0 1 1 25,20.9 M61,21 A4,4 0 1 1 61,20.9 M27,20 L59,20" Stroke="Black" StrokeThickness="4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent" />
+                        </Canvas>
+                        <TextBlock Text="Interrupteur" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Fil" Click="WireToolButton_Click" ToolTip="Fil (raccourci W)">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Path Data="M4,21 H82" Stroke="Black" StrokeThickness="4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                        </Canvas>
+                        <TextBlock Text="Fil (W)" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Diode" Click="AddComponentButton_Click" ToolTip="Diode">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Path Data="M2,21 H23 M23,8 L47,21 L23,34 Z M51,8 V34 M51,21 H84" Stroke="Black" StrokeThickness="4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Miter" Fill="White" />
+                        </Canvas>
+                        <TextBlock Text="Diode" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="LED" Click="AddComponentButton_Click" ToolTip="LED">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Path Data="M2,25 H23 M23,12 L47,25 L23,38 Z M51,12 V38 M51,25 H78 M53,9 L66,-3 M64,13 L77,1" Stroke="Black" StrokeThickness="4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Miter" Fill="White" />
+                            <Path Data="M63,0 L66,-3 L65,2 M74,4 L77,1 L76,6" Fill="Black" />
+                        </Canvas>
+                        <TextBlock Text="LED" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Bouton poussoir" Click="AddComponentButton_Click" ToolTip="Bouton poussoir">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Path Data="M2,12 H16 M70,12 H84 M2,32 H16 M70,32 H84 M16,4 H70 V40 H16 Z M31,12 L42,23 M55,32 L44,21 M31,12 V17 M55,27 V32" Stroke="Black" StrokeThickness="4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent" />
+                        </Canvas>
+                        <TextBlock Text="Bouton poussoir" TextWrapping="Wrap" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Annotation" Click="AddComponentButton_Click" ToolTip="Annotation">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <TextBlock Canvas.Left="31" Canvas.Top="-3" Text="T" FontFamily="Georgia" FontSize="40" Foreground="Black" />
+                        </Canvas>
+                        <TextBlock Text="Annotation" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
             </WrapPanel>
         </Border>
 
-        <Border Grid.Row="2" Margin="10" Background="#0B0B0B"
-                BorderBrush="#444444" BorderThickness="2">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto">
+        <Border Grid.Row="2" Margin="10" Background="#0B0B0B" BorderBrush="#444444" BorderThickness="2">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <Canvas x:Name="DrawingSurface"
                         Width="3000"
                         Height="2000"
                         Background="#F0F0F0"
-                        Margin="10" />
+                        Margin="10"
+                        PreviewMouseLeftButtonDown="DrawingSurface_PreviewMouseLeftButtonDown"
+                        MouseMove="DrawingSurface_MouseMove"
+                        MouseLeftButtonUp="DrawingSurface_MouseLeftButtonUp"
+                        MouseRightButtonDown="DrawingSurface_MouseRightButtonDown" />
             </ScrollViewer>
         </Border>
 
-        <TextBlock x:Name="EditorStatus"
-           Grid.Row="3"
-           Margin="12,2,12,8"
-           Foreground="#DDDDDD"
-           Text="Sélection : cliquez sur un objet. Fil : appuyez sur W pour activer le mode." />
+        <TextBlock x:Name="EditorStatus" Grid.Row="3" Margin="12,2,12,8"
+                   Foreground="#DDDDDD" Text="Sélection : cliquez sur un objet. Fil : appuyez sur W puis dessinez en maintenant le clic gauche." />
     </Grid>
 </Window>
