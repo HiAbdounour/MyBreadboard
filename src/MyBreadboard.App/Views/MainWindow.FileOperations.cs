@@ -15,6 +15,7 @@ public partial class MainWindow
 {
     private const int CurrentDocumentFormatVersion = 1;
     private const int MaximumDocumentItems = 10000;
+    private const int MaximumAnnotationLength = 10000;
     private static readonly JsonSerializerOptions DocumentJsonOptions = new()
     {
         WriteIndented = true,
@@ -174,6 +175,15 @@ public partial class MainWindow
                 continue;
             }
 
+            var annotationText = string.Equals(type, "Annotation", StringComparison.Ordinal)
+                ? component.Child switch
+                {
+                    TextBlock textBlock => textBlock.Text,
+                    TextBox textBox => textBox.Text,
+                    _ => string.Empty
+                }
+                : null;
+
             document.Components.Add(new BreadboardComponentFile
             {
                 Type = type,
@@ -181,7 +191,8 @@ public partial class MainWindow
                 Y = Canvas.GetTop(component),
                 Width = component.Width,
                 Height = component.Height,
-                Rotation = (component.RenderTransform as RotateTransform)?.Angle ?? 0
+                Rotation = (component.RenderTransform as RotateTransform)?.Angle ?? 0,
+                Text = annotationText
             });
         }
 
@@ -277,7 +288,8 @@ public partial class MainWindow
                 !IsFinite(component.X) || !IsFinite(component.Y) ||
                 !IsFinite(component.Width) || component.Width <= 0 ||
                 !IsFinite(component.Height) || component.Height <= 0 ||
-                !IsFinite(component.Rotation))
+                !IsFinite(component.Rotation) ||
+                (component.Text?.Length ?? 0) > MaximumAnnotationLength)
             {
                 throw new InvalidDataException("Le fichier contient un composant avec des propriétés invalides.");
             }
@@ -312,6 +324,12 @@ public partial class MainWindow
             component.Height = savedComponent.Height;
             component.RenderTransformOrigin = new WpfPoint(0.5, 0.5);
             component.RenderTransform = new RotateTransform(NormalizeAngle(savedComponent.Rotation));
+
+            if (string.Equals(savedComponent.Type, "Annotation", StringComparison.Ordinal) &&
+                component.Child is TextBlock annotationText)
+            {
+                annotationText.Text = savedComponent.Text ?? "T";
+            }
         }
 
         foreach (var savedWire in document.Wires)

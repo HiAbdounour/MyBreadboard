@@ -92,15 +92,7 @@ public partial class MainWindow : Window
     {
         if (type == "Annotation")
         {
-            return new TextBlock
-            {
-                Text = "T",
-                FontFamily = new FontFamily("Georgia"),
-                FontSize = 48,
-                Foreground = Brushes.Black,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
+            return CreateAnnotationTextBlock("T");
         }
 
         var geometry = type switch
@@ -144,6 +136,91 @@ public partial class MainWindow : Window
         };
     }
 
+    private static TextBlock CreateAnnotationTextBlock(string text)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            FontFamily = new FontFamily("Georgia"),
+            FontSize = text.Length <= 2 ? 48 : 22,
+            Foreground = Brushes.Black,
+            TextWrapping = TextWrapping.Wrap,
+            TextAlignment = TextAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+    }
+
+    private void BeginAnnotationEdit(Border annotation)
+    {
+        if (annotation.Child is not TextBlock currentText)
+        {
+            return;
+        }
+
+        var editor = new TextBox
+        {
+            Text = currentText.Text,
+            FontFamily = currentText.FontFamily,
+            FontSize = 22,
+            Foreground = Brushes.Black,
+            Background = Brushes.Transparent,
+            BorderThickness = new Thickness(0),
+            Padding = new Thickness(2),
+            TextWrapping = TextWrapping.Wrap,
+            AcceptsReturn = true,
+            HorizontalContentAlignment = HorizontalAlignment.Center,
+            VerticalContentAlignment = VerticalAlignment.Center,
+            Tag = annotation,
+            ToolTip = currentText.Text
+        };
+        editor.LostKeyboardFocus += AnnotationEditor_LostKeyboardFocus;
+        editor.PreviewKeyDown += AnnotationEditor_PreviewKeyDown;
+        annotation.Child = editor;
+        editor.Focus();
+        editor.SelectAll();
+        EditorStatus.Text = "Modification de l’annotation : Entrée pour terminer, Maj+Entrée pour une nouvelle ligne, Échap pour annuler.";
+    }
+
+    private void AnnotationEditor_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (sender is not TextBox editor)
+        {
+            return;
+        }
+
+        if (e.Key == Key.Enter && !Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+        {
+            FinishAnnotationEdit(editor, commit: true);
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape)
+        {
+            FinishAnnotationEdit(editor, commit: false);
+            e.Handled = true;
+        }
+    }
+
+    private void AnnotationEditor_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        if (sender is TextBox editor)
+        {
+            FinishAnnotationEdit(editor, commit: true);
+        }
+    }
+
+    private static void FinishAnnotationEdit(TextBox editor, bool commit)
+    {
+        if (editor.Tag is not Border annotation || !ReferenceEquals(annotation.Child, editor))
+        {
+            return;
+        }
+
+        editor.LostKeyboardFocus -= AnnotationEditor_LostKeyboardFocus;
+        editor.PreviewKeyDown -= AnnotationEditor_PreviewKeyDown;
+        annotation.Child = CreateAnnotationTextBlock(commit ? editor.Text : editor.ToolTip as string ?? string.Empty);
+    }
+
     private ContextMenu CreateObjectContextMenu()
     {
         var contextMenu = new ContextMenu
@@ -167,8 +244,22 @@ public partial class MainWindow : Window
 
     private void Component_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (_isWireMode || sender is not FrameworkElement element)
+        if (_isWireMode || sender is not Border element)
         {
+            return;
+        }
+
+        // The text box handles pointer interaction while annotation editing is active.
+        if (e.OriginalSource is TextBoxBase)
+        {
+            return;
+        }
+
+        if (string.Equals(element.Tag?.ToString(), "Annotation", StringComparison.Ordinal) && e.ClickCount == 2)
+        {
+            SelectElement(element);
+            BeginAnnotationEdit(element);
+            e.Handled = true;
             return;
         }
 
