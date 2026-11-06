@@ -154,10 +154,8 @@
             </WrapPanel>
         </Border>
 
-        <Border Grid.Row="2" Margin="10" Background="#0B0B0B"
-                BorderBrush="#444444" BorderThickness="2">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto">
+        <Border Grid.Row="2" Margin="10" Background="#0B0B0B" BorderBrush="#444444" BorderThickness="2">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <Canvas x:Name="DrawingSurface"
                         Width="3000"
                         Height="2000"
