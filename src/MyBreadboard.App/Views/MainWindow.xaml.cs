@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -15,6 +16,8 @@ public partial class MainWindow : Window
     private Polyline? _activeWire;
     private Point _dragStart;
     private Point _lastWirePointer;
+    private Point _wireSegmentAnchor;
+    private Orientation? _wireSegmentOrientation;
     private double _dragOriginLeft;
     private double _dragOriginTop;
     private bool _isWireMode;
@@ -22,7 +25,6 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        AddDemoContent();
     }
 
     private void AddComponentButton_Click(object sender, RoutedEventArgs e)
@@ -58,13 +60,13 @@ public partial class MainWindow : Window
         var border = new Border
         {
             Width = 120,
-            Height = 80,
-            Background = Brushes.White,
-            BorderBrush = Brushes.Black,
+            Height = 72,
+            Background = Brushes.Transparent,
+            BorderBrush = Brushes.Transparent,
             BorderThickness = new Thickness(2),
-            CornerRadius = new CornerRadius(8),
             Tag = type,
-            Padding = new Thickness(8)
+            ToolTip = type,
+            Child = CreateComponentVisual(type)
         };
 
         Canvas.SetLeft(border, x);
@@ -73,19 +75,65 @@ public partial class MainWindow : Window
         border.MouseRightButtonDown += SelectForContextMenu;
         border.ContextMenu = CreateObjectContextMenu();
 
-        border.Child = new TextBlock
-        {
-            Text = type,
-            FontSize = 12,
-            FontWeight = FontWeights.Bold,
-            Foreground = Brushes.Black,
-            TextAlignment = TextAlignment.Center,
-            TextWrapping = TextWrapping.Wrap,
-            VerticalAlignment = VerticalAlignment.Center
-        };
-
         DrawingSurface.Children.Add(border);
         SelectElement(border);
+    }
+
+    private static FrameworkElement CreateComponentVisual(string type)
+    {
+        if (type == "Annotation")
+        {
+            return new TextBlock
+            {
+                Text = "T",
+                FontFamily = new FontFamily("Georgia"),
+                FontSize = 48,
+                Foreground = Brushes.Black,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+        }
+
+        var geometry = type switch
+        {
+            "Générateur de tension" => "M2,21 H24 M62,21 H84 M24,21 A19,19 0 1 1 62,21 A19,19 0 1 1 24,21 M36,12 L51,21 L36,30",
+            "Générateur de courant" => "M2,21 H18 M48,21 H84 M18,21 A19,19 0 1 1 56,21 A19,19 0 1 1 18,21 M30,21 A19,19 0 1 1 68,21 A19,19 0 1 1 30,21 M38,12 L53,21 L38,30",
+            "Résistance" => "M2,21 H22 M22,9 H64 V33 H22 Z M64,21 H84",
+            "Interrupteur" => "M2,21 H25 M61,21 H84 M25,21 A4,4 0 1 1 25,20.9 M61,21 A4,4 0 1 1 61,20.9 M27,20 L59,20",
+            "Diode" => "M2,21 H23 M23,8 L47,21 L23,34 Z M51,8 V34 M51,21 H84",
+            "LED" => "M2,25 H23 M23,12 L47,25 L23,38 Z M51,12 V38 M51,25 H78 M53,9 L66,-3 M64,13 L77,1",
+            "Bouton poussoir" => "M2,12 H16 M70,12 H84 M2,32 H16 M70,32 H84 M16,4 H70 V40 H16 Z M31,12 L42,23 M55,32 L44,21 M31,12 V17 M55,27 V32",
+            _ => "M4,21 H82"
+        };
+
+        var symbolCanvas = new Canvas { Width = 86, Height = 42 };
+        var symbol = new System.Windows.Shapes.Path
+        {
+            Data = Geometry.Parse(geometry),
+            Stroke = Brushes.Black,
+            StrokeThickness = 3.5,
+            StrokeStartLineCap = PenLineCap.Round,
+            StrokeEndLineCap = PenLineCap.Round,
+            StrokeLineJoin = PenLineJoin.Round,
+            Fill = type is "Diode" or "LED" ? Brushes.White : Brushes.Transparent
+        };
+        symbolCanvas.Children.Add(symbol);
+
+        if (type == "LED")
+        {
+            symbolCanvas.Children.Add(new System.Windows.Shapes.Path
+            {
+                Data = Geometry.Parse("M63,0 L66,-3 L65,2 M74,4 L77,1 L76,6"),
+                Fill = Brushes.Black
+            });
+        }
+
+        return new Viewbox
+        {
+            Stretch = Stretch.Uniform,
+            Margin = new Thickness(4),
+            Child = symbolCanvas
+        };
     }
 
     private ContextMenu CreateObjectContextMenu()
@@ -153,9 +201,10 @@ public partial class MainWindow : Window
             IsHitTestVisible = false
         };
         _activeWire.Points.Add(startPoint);
-        _activeWire.Points.Add(startPoint);
-        DrawingSurface.Children.Add(_activeWire);
+        _wireSegmentAnchor = startPoint;
+        _wireSegmentOrientation = null;
         _lastWirePointer = startPoint;
+        DrawingSurface.Children.Add(_activeWire);
         DrawingSurface.CaptureMouse();
     }
 
@@ -191,19 +240,33 @@ public partial class MainWindow : Window
 
         var deltaX = pointer.X - _lastWirePointer.X;
         var deltaY = pointer.Y - _lastWirePointer.Y;
-        var lastPoint = _activeWire.Points[^1];
-
-        // For each mouse movement, follow its dominant axis. Every stored segment
-        // therefore has either a constant X or a constant Y; diagonal segments are impossible.
-        if (Math.Abs(deltaX) >= Math.Abs(deltaY))
+        if (Math.Abs(deltaX) < 0.1 && Math.Abs(deltaY) < 0.1)
         {
-            _activeWire.Points[^1] = new Point(pointer.X, lastPoint.Y);
-        }
-        else
-        {
-            _activeWire.Points[^1] = new Point(lastPoint.X, pointer.Y);
+            return;
         }
 
+        var nextOrientation = Math.Abs(deltaX) >= Math.Abs(deltaY)
+            ? Orientation.Horizontal
+            : Orientation.Vertical;
+
+        if (_wireSegmentOrientation is null)
+        {
+            _wireSegmentOrientation = nextOrientation;
+            _activeWire.Points.Add(_wireSegmentAnchor);
+        }
+        else if (_wireSegmentOrientation != nextOrientation)
+        {
+            // The previous endpoint becomes a fixed corner before a segment
+            // on the other axis is started. This prevents diagonal connections.
+            _wireSegmentAnchor = _activeWire.Points[^1];
+            _wireSegmentOrientation = nextOrientation;
+            _activeWire.Points.Add(_wireSegmentAnchor);
+        }
+
+        var endpoint = _wireSegmentOrientation == Orientation.Horizontal
+            ? new Point(pointer.X, _wireSegmentAnchor.Y)
+            : new Point(_wireSegmentAnchor.X, pointer.Y);
+        _activeWire.Points[^1] = endpoint;
         _lastWirePointer = pointer;
     }
 
@@ -211,8 +274,7 @@ public partial class MainWindow : Window
     {
         if (_activeWire is not null)
         {
-            var finalPointer = e.GetPosition(DrawingSurface);
-            ExtendOrthogonalWire(finalPointer);
+            ExtendOrthogonalWire(e.GetPosition(DrawingSurface));
             _activeWire = null;
             DrawingSurface.ReleaseMouseCapture();
             return;
@@ -272,11 +334,6 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (ReferenceEquals(_selectedElement, _activeWire))
-        {
-            _activeWire = null;
-        }
-
         DrawingSurface.Children.Remove(_selectedElement);
         _selectedElement = null;
     }
@@ -285,7 +342,7 @@ public partial class MainWindow : Window
     {
         if (_selectedElement is Border selectedBorder && selectedBorder != element)
         {
-            selectedBorder.BorderBrush = Brushes.Black;
+            selectedBorder.BorderBrush = Brushes.Transparent;
             selectedBorder.BorderThickness = new Thickness(2);
         }
 
@@ -307,74 +364,5 @@ public partial class MainWindow : Window
             shape.Stroke = SelectionBrush;
             shape.StrokeThickness = 4;
         }
-    }
-
-    private void AddDemoContent()
-    {
-        var sourceRect = new Rectangle
-        {
-            Width = 120,
-            Height = 80,
-            Fill = Brushes.White,
-            Stroke = Brushes.Black,
-            StrokeThickness = 2,
-            Tag = "Générateur de tension"
-        };
-        Canvas.SetLeft(sourceRect, 200);
-        Canvas.SetTop(sourceRect, 200);
-        sourceRect.MouseLeftButtonDown += Component_MouseLeftButtonDown;
-        sourceRect.MouseRightButtonDown += SelectForContextMenu;
-        sourceRect.ContextMenu = CreateObjectContextMenu();
-        DrawingSurface.Children.Add(sourceRect);
-
-        var loadRect = new Rectangle
-        {
-            Width = 120,
-            Height = 80,
-            Fill = Brushes.White,
-            Stroke = Brushes.Black,
-            StrokeThickness = 2,
-            Tag = "Résistance"
-        };
-        Canvas.SetLeft(loadRect, 700);
-        Canvas.SetTop(loadRect, 300);
-        loadRect.MouseLeftButtonDown += Component_MouseLeftButtonDown;
-        loadRect.MouseRightButtonDown += SelectForContextMenu;
-        loadRect.ContextMenu = CreateObjectContextMenu();
-        DrawingSurface.Children.Add(loadRect);
-
-        DrawingSurface.Children.Add(new Line
-        {
-            X1 = 320, Y1 = 240, X2 = 500, Y2 = 240,
-            Stroke = Brushes.Black, StrokeThickness = 2,
-            IsHitTestVisible = false
-        });
-        DrawingSurface.Children.Add(new Line
-        {
-            X1 = 500, Y1 = 240, X2 = 500, Y2 = 340,
-            Stroke = Brushes.Black, StrokeThickness = 2,
-            IsHitTestVisible = false
-        });
-        DrawingSurface.Children.Add(new Line
-        {
-            X1 = 500, Y1 = 340, X2 = 700, Y2 = 340,
-            Stroke = Brushes.Black, StrokeThickness = 2,
-            IsHitTestVisible = false
-        });
-
-        var annotation = new TextBlock
-        {
-            Text = "Schéma de test",
-            FontSize = 24,
-            Foreground = Brushes.Black,
-            Tag = "Annotation",
-            Background = Brushes.Transparent
-        };
-        Canvas.SetLeft(annotation, 420);
-        Canvas.SetTop(annotation, 120);
-        annotation.MouseLeftButtonDown += Component_MouseLeftButtonDown;
-        annotation.MouseRightButtonDown += SelectForContextMenu;
-        annotation.ContextMenu = CreateObjectContextMenu();
-        DrawingSurface.Children.Add(annotation);
     }
 }
