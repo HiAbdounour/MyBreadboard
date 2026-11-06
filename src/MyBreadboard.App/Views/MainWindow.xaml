@@ -63,5 +63,11 @@
                         Margin="10" />
             </ScrollViewer>
         </Border>
+
+        <TextBlock x:Name="EditorStatus"
+           Grid.Row="3"
+           Margin="12,2,12,8"
+           Foreground="#DDDDDD"
+           Text="Sélection : cliquez sur un objet. Fil : appuyez sur W pour activer le mode." />
     </Grid>
 </Window>
