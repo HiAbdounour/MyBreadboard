@@ -12,6 +12,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0" Background="#2A2A2A" Foreground="White">
@@ -62,5 +63,11 @@
                         Margin="10" />
             </ScrollViewer>
         </Border>
+
+        <TextBlock x:Name="EditorStatus"
+           Grid.Row="3"
+           Margin="12,2,12,8"
+           Foreground="#DDDDDD"
+           Text="Sélection : cliquez sur un objet. Fil : appuyez sur W pour activer le mode." />
     </Grid>
 </Window>
