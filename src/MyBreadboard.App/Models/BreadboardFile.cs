@@ -18,6 +18,7 @@ public sealed class BreadboardComponentFile
     public double Width { get; set; }
     public double Height { get; set; }
     public double Rotation { get; set; }
+    public string? Text { get; set; }
 }
 
 public sealed class BreadboardWireFile
