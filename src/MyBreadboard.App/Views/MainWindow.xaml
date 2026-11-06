@@ -7,6 +7,36 @@
         WindowState="Maximized"
         Background="#111111"
         PreviewKeyDown="Window_PreviewKeyDownWithRotation">
+    <Window.Resources>
+        <Style x:Key="DarkMenuItemStyle" TargetType="MenuItem">
+            <Setter Property="Background" Value="#2A2A2A" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Style.Triggers>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="Background" Value="#6842A6" />
+                    <Setter Property="Foreground" Value="White" />
+                </Trigger>
+                <Trigger Property="IsSubmenuOpen" Value="True">
+                    <Setter Property="Background" Value="#6842A6" />
+                    <Setter Property="Foreground" Value="White" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="PaletteButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="112" />
+            <Setter Property="Height" Value="88" />
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="Background" Value="#D0D0D0" />
+            <Setter Property="Foreground" Value="#111111" />
+            <Setter Property="BorderBrush" Value="#777777" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -16,6 +46,13 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0" Background="#2A2A2A" Foreground="White">
+            <Menu.Resources>
+                <Style TargetType="MenuItem" BasedOn="{StaticResource DarkMenuItemStyle}" />
+                <Style TargetType="Separator">
+                    <Setter Property="Background" Value="#555555" />
+                    <Setter Property="Margin" Value="4,2" />
+                </Style>
+            </Menu.Resources>
             <MenuItem Header="Fichier">
                 <MenuItem Header="Nouveau" />
                 <MenuItem Header="Ouvrir" />
@@ -26,7 +63,7 @@
             <MenuItem Header="Édition">
                 <MenuItem Header="Copier" />
                 <MenuItem Header="Coller" />
-                <MenuItem Header="Supprimer" />
+                <MenuItem Header="Supprimer" Click="DeleteSelected_Click" />
                 <MenuItem Header="Tout sélectionner" />
             </MenuItem>
             <MenuItem Header="Affichage">
@@ -38,7 +75,7 @@
             </MenuItem>
         </Menu>
 
-        <Border Grid.Row="1" Background="#BDBDBD" Padding="12"
+        <Border Grid.Row="1" Background="#BDBDBD" Padding="8"
                 BorderBrush="#555555" BorderThickness="1">
             <WrapPanel>
                 <Button Style="{StaticResource PaletteButtonStyle}" Tag="Générateur de tension" Click="AddComponentButton_Click" ToolTip="Générateur de tension">
@@ -125,15 +162,16 @@
                         Width="3000"
                         Height="2000"
                         Background="#F0F0F0"
-                        Margin="10" />
+                        Margin="10"
+                        PreviewMouseLeftButtonDown="DrawingSurface_PreviewMouseLeftButtonDown"
+                        MouseMove="DrawingSurface_MouseMove"
+                        MouseLeftButtonUp="DrawingSurface_MouseLeftButtonUp"
+                        MouseRightButtonDown="DrawingSurface_MouseRightButtonDown" />
             </ScrollViewer>
         </Border>
 
-        <TextBlock x:Name="EditorStatus"
-           Grid.Row="3"
-           Margin="12,2,12,8"
-           Foreground="#DDDDDD"
-           Text="Sélection : cliquez sur un objet. Fil : appuyez sur W pour activer le mode."
-        />
+        <TextBlock x:Name="EditorStatus" Grid.Row="3" Margin="12,2,12,8"
+                   Foreground="#DDDDDD"
+                   Text="Sélection : cliquez sur un objet. Fil : appuyez sur W pour activer le mode." />
     </Grid>
 </Window>
