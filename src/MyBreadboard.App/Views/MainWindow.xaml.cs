@@ -92,12 +92,13 @@ public partial class MainWindow : Window
     {
         var geometry = type switch
         {
-            "Générateur de tension" => "M2,21 H24 M62,21 H84 M24,21 A19,19 0 1 1 62,21 A19,19 0 1 1 24,21 M36,12 L51,21 L36,30",
-            "Générateur de courant" => "M2,21 H18 M48,21 H84 M18,21 A19,19 0 1 1 56,21 A19,19 0 1 1 18,21 M30,21 A19,19 0 1 1 68,21 A19,19 0 1 1 30,21 M38,12 L53,21 L38,30",
-            "Résistance" => "M2,21 H22 M22,9 H64 V33 H22 Z M64,21 H84",
+            "LED" => "M2,21 H28 M60,21 H84 M28,4 L58,21 L28,38 Z M60,4 V38 M38,10 L53,1 M53,1 L50,8 M53,1 L46,2 M51,17 L66,8 M66,8 L63,15 M66,8 L59,9",
+            "Diode" => "M2,21 H28 M28,4 L58,21 L28,38 Z M60,4 V38 M60,21 H84",
+            "Bouton poussoir" => "M2,12 H20 M66,12 H84 M2,32 H20 M66,32 H84 M13,6 H72 V36 H13 Z M20,12 L35,32 M50,12 L66,32",
+            "Résistance" => "M2,21 H13 M13,11 H72 V31 H13 Z M72,21 H84",
+            "Générateur de courant" => "M2,21 H16 M70,21 H84 M21,21 A20,20 0 1 1 61,21 A20,20 0 1 1 21,21 M36,12 L54,22 M54,22 L49,15 M54,22 L46,23",
+            "Générateur de tension" => "M2,21 H23 M63,21 H84 M23,21 A20,20 0 1 1 63,21 A20,20 0 1 1 23,21 M35,12 L52,22 M52,22 L47,15 M52,22 L44,23",
             "Interrupteur" => "M2,21 H25 M61,21 H84 M25,21 A4,4 0 1 1 25,20.9 M61,21 A4,4 0 1 1 61,20.9 M27,20 L59,20",
-            "Diode" => "M2,21 H23 M23,8 L47,21 L23,34 Z M51,8 V34 M51,21 H84",
-            "LED" => "M2,25 H23 M23,12 L47,25 L23,38 Z M51,12 V38 M51,25 H78 M53,9 L66,-3 M64,13 L77,1",
             "Masse" => "M43,3 V21 M20,21 H66 M26,27 H60 M33,33 H53",
             "Boîte noire" => "M12,2 H74 V40 H12 Z",
             "Cellule photovoltaïque" => "M2,21 H12 M74,21 H84 M12,14 H74 V34 H12 Z M25,3 L34,12 M34,12 L33,7 M34,12 L29,11 M52,3 L61,12 M61,12 L56,11 M61,12 L60,7",
@@ -105,7 +106,6 @@ public partial class MainWindow : Window
             "Moteur" => "M2,21 H21 M63,21 H84 M42,0 A21,21 0 1 1 42,42 A21,21 0 1 1 42,0 M34,28 V14 L42,23 L50,14 V28",
             "Potentiomètre" => "M2,21 H22 M22,9 H64 V33 H22 Z M64,21 H84 M43,33 V40",
             "Résistance variable" => "M2,21 H22 M22,9 H64 V33 H22 Z M64,21 H84 M12,40 L72,0 M72,0 L62,0 M72,0 L72,10",
-            "Bouton poussoir" => "M2,12 H16 M70,12 H84 M2,32 H16 M70,32 H84 M16,4 H70 V40 H16 Z M31,12 L42,23 M55,32 L44,21 M31,12 V17 M55,27 V32",
             _ => "M4,21 H82"
         };
 
