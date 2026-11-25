@@ -29,6 +29,62 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        AddSvgComponentsToPalette();
+    }
+
+    private void AddSvgComponentsToPalette()
+    {
+        if (Content is not Grid root)
+        {
+            return;
+        }
+
+        var palette = root.Children
+            .OfType<Border>()
+            .FirstOrDefault(border => Grid.GetRow(border) == 1)?.Child as WrapPanel;
+        if (palette is null)
+        {
+            return;
+        }
+
+        string[] names =
+        [
+            "Masse",
+            "Boîte noire",
+            "Cellule photovoltaïque",
+            "Photodiode",
+            "Moteur",
+            "Potentiomètre",
+            "Résistance variable"
+        ];
+
+        foreach (var name in names)
+        {
+            var button = new Button
+            {
+                Style = (Style)FindResource("PaletteButtonStyle"),
+                Tag = name,
+                ToolTip = name
+            };
+            var content = new StackPanel { HorizontalAlignment = HorizontalAlignment.Center };
+            content.Children.Add(new Viewbox
+            {
+                Width = 86,
+                Height = 58,
+                Stretch = Stretch.Uniform,
+                Child = CreateSvgComponentVisual(name)
+            });
+            content.Children.Add(new TextBlock
+            {
+                Text = name,
+                TextWrapping = TextWrapping.Wrap,
+                TextAlignment = TextAlignment.Center,
+                FontSize = 11
+            });
+            button.Content = content;
+            button.Click += AddComponentButton_Click;
+            palette.Children.Add(button);
+        }
     }
 
     private void AddComponentButton_Click(object sender, RoutedEventArgs e)
@@ -90,6 +146,12 @@ public partial class MainWindow : Window
 
     private static FrameworkElement CreateComponentVisual(string type)
     {
+        if (type is "Masse" or "Boîte noire" or "Cellule photovoltaïque" or "Photodiode" or
+            "Moteur" or "Potentiomètre" or "Résistance variable")
+        {
+            return CreateSvgComponentVisual(type);
+        }
+
         if (type == "Annotation")
         {
             return CreateAnnotationTextBlock("T");
@@ -98,7 +160,7 @@ public partial class MainWindow : Window
         var geometry = type switch
         {
             "Générateur de tension" => "M2,21 H24 M62,21 H84 M24,21 A19,19 0 1 1 62,21 A19,19 0 1 1 24,21 M36,12 L51,21 L36,30",
-            "Générateur de courant" => "M2,21 H18 M48,21 H84 M18,21 A19,19 0 1 1 56,21 A19,19 0 1 1 18,21 M30,21 A19,19 0 1 1 68,21 A19,19 0 1 1 30,21 M38,12 L53,21 L38,30",
+            "Générateur de courant" => "M2,21 H18 M48,21 H84 M18,21 A19,19 0 1 1 56,21 A19,19 0 1 1 18,21 M30,21 A19,21 0 1 1 68,21 A19,21 0 1 1 30,21 M38,12 L53,21 L38,30",
             "Résistance" => "M2,21 H22 M22,9 H64 V33 H22 Z M64,21 H84",
             "Interrupteur" => "M2,21 H25 M61,21 H84 M25,21 A4,4 0 1 1 25,20.9 M61,21 A4,4 0 1 1 61,20.9 M27,20 L59,20",
             "Diode" => "M2,21 H23 M23,8 L47,21 L23,34 Z M51,8 V34 M51,21 H84",
@@ -134,6 +196,179 @@ public partial class MainWindow : Window
             Margin = new Thickness(4),
             Child = symbolCanvas
         };
+    }
+
+    private static FrameworkElement CreateSvgComponentVisual(string type)
+    {
+        var canvas = new Canvas { Width = 800, Height = 600 };
+
+        switch (type)
+        {
+            case "Masse":
+                AddSvgLine(canvas, 311.80043, 268.00003, 488.19958, 268);
+                AddSvgLine(canvas, 347.3006, 286, 452.69942, 285);
+                AddSvgLine(canvas, 370.8007, 302.99999, 429.1993, 301.99999);
+                AddSvgLine(canvas, 398, 92, 398, 266.00264);
+                break;
+            case "Boîte noire":
+                canvas.Children.Add(new Rectangle
+                {
+                    Width = 291.00136,
+                    Height = 431.00201,
+                    Left = 224.00289,
+                    Top = 90.00182,
+                    Fill = Brushes.White,
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 10
+                });
+                break;
+            case "Cellule photovoltaïque":
+                AddSvgLine(canvas, 203, 261, 553.39998, 260);
+                AddSvgRectangle(canvas, 246.00299, 200.00233, 261.00122, 114.00053);
+                AddSolarRay(canvas, 308.77512, 129.64132, 432.7757, 130.64132, 370.775, 130.141);
+                AddSolarRay(canvas, 374.33422, 185.50245, 340.33406, 158.50232, 357.334, 172.002);
+                AddSolarRay(canvas, 350.13459, 148.6203, 320.13445, 171.62041, 335.135, 160.12);
+                AddSolarRay(canvas, 384.77491, 137.64168, 508.77549, 138.64168, 446.775, 138.142);
+                AddSolarRay(canvas, 450.33391, 193.50286, 416.33375, 166.50273, 433.334, 180.003);
+                AddSolarRay(canvas, 426.13428, 156.62071, 396.13414, 179.62082, 411.134, 168.121);
+                break;
+            case "Photodiode":
+                AddSvgLine(canvas, 203, 261, 553.39998, 260);
+                canvas.Children.Add(new System.Windows.Shapes.Path
+                {
+                    Data = Geometry.Parse("M292.19824,338.00073 L385.19869,182 L478.19914,338.00073 Z"),
+                    Fill = Brushes.White,
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 10,
+                    RenderTransform = new RotateTransform(90, 385.199, 260)
+                });
+                AddSvgLine(canvas, 463.004, 160.00215, 462.004, 364.0031);
+                AddPhotodiodeRay(canvas, 336.00341, 112.00191, 460.00399, 113.00192,
+                    423.00381, 86.00179, 457.00397, 113.00192,
+                    428.00384, 136.00202, 458.00398, 113.00192, 398.004, 111.002);
+                AddPhotodiodeRay(canvas, 390.00366, 135.00202, 514.00424, 136.00202,
+                    477.00407, 109.0019, 511.00423, 136.00202,
+                    482.00409, 159.00213, 512.00423, 136.00202, 452.004, 134.002);
+                break;
+            case "Moteur":
+                AddSvgLine(canvas, 203, 261, 553.39998, 260);
+                canvas.Children.Add(new Ellipse
+                {
+                    Width = 184,
+                    Height = 178,
+                    Left = 281,
+                    Top = 171,
+                    Fill = Brushes.White,
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 10
+                });
+                canvas.Children.Add(new TextBlock
+                {
+                    Text = "M",
+                    FontFamily = new FontFamily("Alumni Sans"),
+                    FontWeight = FontWeights.Bold,
+                    FontSize = 120,
+                    Foreground = Brushes.Black,
+                    Left = 343.39999,
+                    Top = 173.4
+                });
+                break;
+            case "Potentiomètre":
+                AddSvgLine(canvas, 203, 261, 553.39998, 260);
+                AddSvgRectangle(canvas, 249.39999, 219, 251, 82);
+                AddSvgLine(canvas, 375.39999, 301.4, 375, 337.4);
+                break;
+            case "Résistance variable":
+                AddSvgLine(canvas, 203, 261, 553.39998, 260);
+                AddSvgRectangle(canvas, 249.39999, 219, 251, 82);
+                AddSvgLine(canvas, 246.39999, 347.4, 498.39999, 163.4);
+                AddSvgPath(canvas, "M500.39999,163.4 L462.39999,163.4");
+                AddSvgPath(canvas, "M514.39999,181.4 L476.39999,181.4",
+                    new RotateTransform(90, 495.4, 181.4));
+                break;
+        }
+
+        return new Viewbox
+        {
+            Stretch = Stretch.Uniform,
+            Margin = new Thickness(4),
+            Child = canvas
+        };
+    }
+
+    private static void AddSvgLine(Canvas canvas, double x1, double y1, double x2, double y2)
+    {
+        canvas.Children.Add(new Line
+        {
+            X1 = x1,
+            Y1 = y1,
+            X2 = x2,
+            Y2 = y2,
+            Stroke = Brushes.Black,
+            StrokeThickness = 10
+        });
+    }
+
+    private static void AddSvgRectangle(Canvas canvas, double left, double top, double width, double height)
+    {
+        canvas.Children.Add(new Rectangle
+        {
+            Left = left,
+            Top = top,
+            Width = width,
+            Height = height,
+            Fill = Brushes.White,
+            Stroke = Brushes.Black,
+            StrokeThickness = 10
+        });
+    }
+
+    private static void AddSvgPath(Canvas canvas, string geometry, Transform? transform = null)
+    {
+        canvas.Children.Add(new System.Windows.Shapes.Path
+        {
+            Data = Geometry.Parse(geometry),
+            Stroke = Brushes.Black,
+            StrokeThickness = 10,
+            RenderTransform = transform
+        });
+    }
+
+    private static void AddSolarRay(Canvas canvas, double x1, double y1, double x2, double y2,
+        double centerX, double centerY)
+    {
+        var geometry = new GeometryGroup
+        {
+            Transform = new RotateTransform(125, centerX, centerY)
+        };
+        geometry.Children.Add(new LineGeometry(new Point(x1, y1), new Point(x2, y2)));
+        AddSvgPath(canvas, geometry);
+    }
+
+    private static void AddPhotodiodeRay(Canvas canvas,
+        double rayX1, double rayY1, double rayX2, double rayY2,
+        double arrowOneX1, double arrowOneY1, double arrowOneX2, double arrowOneY2,
+        double arrowTwoX1, double arrowTwoY1, double arrowTwoX2, double arrowTwoY2,
+        double centerX, double centerY)
+    {
+        var geometry = new GeometryGroup
+        {
+            Transform = new RotateTransform(125, centerX, centerY)
+        };
+        geometry.Children.Add(new LineGeometry(new Point(rayX1, rayY1), new Point(rayX2, rayY2)));
+        geometry.Children.Add(new LineGeometry(new Point(arrowOneX1, arrowOneY1), new Point(arrowOneX2, arrowOneY2)));
+        geometry.Children.Add(new LineGeometry(new Point(arrowTwoX1, arrowTwoY1), new Point(arrowTwoX2, arrowTwoY2)));
+        AddSvgPath(canvas, geometry);
+    }
+
+    private static void AddSvgPath(Canvas canvas, Geometry geometry)
+    {
+        canvas.Children.Add(new System.Windows.Shapes.Path
+        {
+            Data = geometry,
+            Stroke = Brushes.Black,
+            StrokeThickness = 10
+        });
     }
 
     private static TextBlock CreateAnnotationTextBlock(string text)
