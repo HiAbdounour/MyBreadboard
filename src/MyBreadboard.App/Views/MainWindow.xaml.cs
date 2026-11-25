@@ -99,7 +99,7 @@ public partial class MainWindow : Window
             "Diode" => "M2,21 H23 M23,8 L47,21 L23,34 Z M51,8 V34 M51,21 H84",
             "LED" => "M2,25 H23 M23,12 L47,25 L23,38 Z M51,12 V38 M51,25 H78 M53,9 L66,-3 M64,13 L77,1",
             "Masse" => "M43,3 V21 M20,21 H66 M26,27 H60 M33,33 H53",
-            "Boîte noire" => "M29,2 H57 V40 H29 Z",
+            "Boîte noire" => "M12,2 H74 V40 H12 Z",
             "Cellule photovoltaïque" => "M2,21 H12 M74,21 H84 M12,14 H74 V34 H12 Z M25,3 L34,12 M34,12 L33,7 M34,12 L29,11 M52,3 L61,12 M61,12 L56,11 M61,12 L60,7",
             "Photodiode" => "M2,21 H23 M23,8 L47,21 L23,34 Z M51,8 V34 M51,21 H84 M32,3 L41,12 M41,12 L36,11 M41,12 L40,7 M49,3 L58,12 M58,12 L53,11 M58,12 L57,7",
             "Moteur" => "M2,21 H21 M63,21 H84 M42,0 A21,21 0 1 1 42,42 A21,21 0 1 1 42,0 M34,28 V14 L42,23 L50,14 V28",
