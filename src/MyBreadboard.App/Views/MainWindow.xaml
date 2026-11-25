@@ -162,7 +162,7 @@
                 <Button Style="{StaticResource PaletteButtonStyle}" Tag="Cellule photovoltaïque" Click="AddComponentButton_Click" ToolTip="Cellule photovoltaïque">
                     <StackPanel HorizontalAlignment="Center">
                         <Canvas Width="86" Height="42">
-                            <Path Data="M3,22 H83 M26,15 H60 V29 H26 Z M26,6 L45,8 M19,11 L27,15 M54,9 L70,4 M58,15 L76,13" Stroke="Black" StrokeThickness="3" Fill="White" />
+                            <Path Data="M2,21 H12 M74,21 H84 M12,14 H74 V34 H12 Z M25,3 L34,12 M34,12 L33,7 M34,12 L29,11 M52,3 L61,12 M61,12 L56,11 M61,12 L60,7" Stroke="Black" StrokeThickness="3" Fill="White" />
                         </Canvas>
                         <TextBlock Text="Cellule photovoltaïque" TextWrapping="Wrap" TextAlignment="Center" FontSize="11" />
                     </StackPanel>
@@ -170,7 +170,7 @@
                 <Button Style="{StaticResource PaletteButtonStyle}" Tag="Photodiode" Click="AddComponentButton_Click" ToolTip="Photodiode">
                     <StackPanel HorizontalAlignment="Center">
                         <Canvas Width="86" Height="42">
-                            <Path Data="M3,22 H83 M33,31 L44,11 L55,31 Z M57,9 V34 M23,5 L39,14 M31,3 L39,14 L27,11 M39,2 L52,13 M47,1 L52,13 L41,10" Stroke="Black" StrokeThickness="3" Fill="White" />
+                            <Path Data="M2,21 H23 M23,8 L47,21 L23,34 Z M51,8 V34 M51,21 H84 M32,3 L41,12 M41,12 L36,11 M41,12 L40,7 M49,3 L58,12 M58,12 L53,11 M58,12 L57,7" Stroke="Black" StrokeThickness="3" Fill="White" />
                         </Canvas>
                         <TextBlock Text="Photodiode" TextAlignment="Center" FontSize="11" />
                     </StackPanel>
@@ -178,8 +178,7 @@
                 <Button Style="{StaticResource PaletteButtonStyle}" Tag="Moteur" Click="AddComponentButton_Click" ToolTip="Moteur">
                     <StackPanel HorizontalAlignment="Center">
                         <Canvas Width="86" Height="42">
-                            <Ellipse Canvas.Left="21" Canvas.Top="4" Width="44" Height="36" Fill="White" Stroke="Black" StrokeThickness="3" />
-                            <TextBlock Canvas.Left="37" Canvas.Top="6" Text="M" FontWeight="Bold" FontSize="24" Foreground="Black" />
+                           <Path Data="M2,21 H21 M63,21 H84 M42,0 A21,21 0 1 1 42,42 A21,21 0 1 1 42,0 M34,28 V14 L42,23 L50,14 V28" Stroke="Black" StrokeThickness="3" Fill="White" />
                         </Canvas>
                         <TextBlock Text="Moteur" TextAlignment="Center" FontSize="11" />
                     </StackPanel>
@@ -187,7 +186,7 @@
                 <Button Style="{StaticResource PaletteButtonStyle}" Tag="Potentiomètre" Click="AddComponentButton_Click" ToolTip="Potentiomètre">
                     <StackPanel HorizontalAlignment="Center">
                         <Canvas Width="86" Height="42">
-                            <Path Data="M3,22 H83 M25,14 H61 V30 H25 Z M43,30 V39" Stroke="Black" StrokeThickness="3" Fill="White" />
+                            <Path Data="M2,21 H22 M22,9 H64 V33 H22 Z M64,21 H84 M43,33 V40" Stroke="Black" StrokeThickness="3" Fill="White" />
                         </Canvas>
                         <TextBlock Text="Potentiomètre" TextWrapping="Wrap" TextAlignment="Center" FontSize="11" />
                     </StackPanel>
