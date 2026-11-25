@@ -29,62 +29,6 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        AddSvgComponentsToPalette();
-    }
-
-    private void AddSvgComponentsToPalette()
-    {
-        if (Content is not Grid root)
-        {
-            return;
-        }
-
-        var palette = root.Children
-            .OfType<Border>()
-            .FirstOrDefault(border => Grid.GetRow(border) == 1)?.Child as WrapPanel;
-        if (palette is null)
-        {
-            return;
-        }
-
-        string[] names =
-        [
-            "Masse",
-            "Boîte noire",
-            "Cellule photovoltaïque",
-            "Photodiode",
-            "Moteur",
-            "Potentiomètre",
-            "Résistance variable"
-        ];
-
-        foreach (var name in names)
-        {
-            var button = new Button
-            {
-                Style = (Style)FindResource("PaletteButtonStyle"),
-                Tag = name,
-                ToolTip = name
-            };
-            var content = new StackPanel { HorizontalAlignment = HorizontalAlignment.Center };
-            content.Children.Add(new Viewbox
-            {
-                Width = 86,
-                Height = 58,
-                Stretch = Stretch.Uniform,
-                Child = CreateSvgComponentVisual(name)
-            });
-            content.Children.Add(new TextBlock
-            {
-                Text = name,
-                TextWrapping = TextWrapping.Wrap,
-                TextAlignment = TextAlignment.Center,
-                FontSize = 11
-            });
-            button.Content = content;
-            button.Click += AddComponentButton_Click;
-            palette.Children.Add(button);
-        }
     }
 
     private void AddComponentButton_Click(object sender, RoutedEventArgs e)
