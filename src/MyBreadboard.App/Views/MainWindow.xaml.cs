@@ -93,7 +93,7 @@ public partial class MainWindow : Window
         var geometry = type switch
         {
             "Générateur de tension" => "M2,21 H24 M62,21 H84 M24,21 A19,19 0 1 1 62,21 A19,19 0 1 1 24,21 M36,12 L51,21 L36,30",
-            "Générateur de courant" => "M2,21 H18 M48,21 H84 M18,21 A19,19 0 1 1 56,21 A19,19 0 1 1 18,21 M30,21 A19,21 0 1 1 68,21 A19,21 0 1 1 30,21 M38,12 L53,21 L38,30",
+            "Générateur de courant" => "M2,21 H18 M48,21 H84 M18,21 A19,19 0 1 1 56,21 A19,19 0 1 1 18,21 M30,21 A19,19 0 1 1 68,21 A19,19 0 1 1 30,21 M38,12 L53,21 L38,30",
             "Résistance" => "M2,21 H22 M22,9 H64 V33 H22 Z M64,21 H84",
             "Interrupteur" => "M2,21 H25 M61,21 H84 M25,21 A4,4 0 1 1 25,20.9 M61,21 A4,4 0 1 1 61,20.9 M27,20 L59,20",
             "Diode" => "M2,21 H23 M23,8 L47,21 L23,34 Z M51,8 V34 M51,21 H84",
