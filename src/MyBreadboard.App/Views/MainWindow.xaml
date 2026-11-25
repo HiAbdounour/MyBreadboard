@@ -143,6 +143,63 @@
                         <TextBlock Text="Bouton poussoir" TextWrapping="Wrap" TextAlignment="Center" FontSize="11" />
                     </StackPanel>
                 </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Masse" Click="AddComponentButton_Click" ToolTip="Masse">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Path Data="M43,3 V21 M20,21 H66 M26,27 H60 M33,33 H53" Stroke="Black" StrokeThickness="3" />
+                        </Canvas>
+                        <TextBlock Text="Masse" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Boîte noire" Click="AddComponentButton_Click" ToolTip="Boîte noire">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Rectangle Canvas.Left="28" Canvas.Top="3" Width="30" Height="36" Fill="White" Stroke="Black" StrokeThickness="3" />
+                        </Canvas>
+                        <TextBlock Text="Boîte noire" TextWrapping="Wrap" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Cellule photovoltaïque" Click="AddComponentButton_Click" ToolTip="Cellule photovoltaïque">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Path Data="M3,22 H83 M26,15 H60 V29 H26 Z M26,6 L45,8 M19,11 L27,15 M54,9 L70,4 M58,15 L76,13" Stroke="Black" StrokeThickness="3" Fill="White" />
+                        </Canvas>
+                        <TextBlock Text="Cellule photovoltaïque" TextWrapping="Wrap" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Photodiode" Click="AddComponentButton_Click" ToolTip="Photodiode">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Path Data="M3,22 H83 M33,31 L44,11 L55,31 Z M57,9 V34 M23,5 L39,14 M31,3 L39,14 L27,11 M39,2 L52,13 M47,1 L52,13 L41,10" Stroke="Black" StrokeThickness="3" Fill="White" />
+                        </Canvas>
+                        <TextBlock Text="Photodiode" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Moteur" Click="AddComponentButton_Click" ToolTip="Moteur">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Ellipse Canvas.Left="21" Canvas.Top="4" Width="44" Height="36" Fill="White" Stroke="Black" StrokeThickness="3" />
+                            <TextBlock Canvas.Left="37" Canvas.Top="6" Text="M" FontWeight="Bold" FontSize="24" Foreground="Black" />
+                        </Canvas>
+                        <TextBlock Text="Moteur" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Potentiomètre" Click="AddComponentButton_Click" ToolTip="Potentiomètre">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Path Data="M3,22 H83 M25,14 H61 V30 H25 Z M43,30 V39" Stroke="Black" StrokeThickness="3" Fill="White" />
+                        </Canvas>
+                        <TextBlock Text="Potentiomètre" TextWrapping="Wrap" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{StaticResource PaletteButtonStyle}" Tag="Résistance variable" Click="AddComponentButton_Click" ToolTip="Résistance variable">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Canvas Width="86" Height="42">
+                            <Path Data="M3,22 H83 M25,14 H61 V30 H25 Z M23,39 L59,5 M61,5 H52 M61,5 V14" Stroke="Black" StrokeThickness="3" Fill="White" />
+                        </Canvas>
+                        <TextBlock Text="Résistance variable" TextWrapping="Wrap" TextAlignment="Center" FontSize="11" />
+                    </StackPanel>
+                </Button>
                 <Button Style="{StaticResource PaletteButtonStyle}" Tag="Annotation" Click="AddComponentButton_Click" ToolTip="Annotation">
                     <StackPanel HorizontalAlignment="Center">
                         <Canvas Width="86" Height="42">
