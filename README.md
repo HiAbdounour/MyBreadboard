@@ -21,12 +21,12 @@ MyBreadboard est un prototype fonctionnel destiné au dessin de schémas électr
 - **Copier, coller et Tout sélectionner** sont présents, mais ne sont pas encore fiables à 100 % ; leur comportement peut être incomplet ou inattendu.
 - **Le zoom n’est pas implémenté bien que présent dans le menu du haut.**
 - Certaines interactions peuvent nécessiter des améliorations.
-- De nombreux composants simples manquent.
-- Certains symboles, en particulier ceux du bouton poussoir et de la LED, sont à revoir.
+- Certains composants simples manquent.
+- Certains symboles, en particulier ceux de la LED, sont à revoir.
 
 ### Non-implémentations
 MyBreadboard est un outil de représentation visuelle de circuits électriques. Il n'est pas conçu pour réaliser des simulations.\
-De même, les composants jugés trop complexes seront refusés.
+De même, les composants jugés trop complexes seront refusés. En cas de besoin, merci d'utiliser la boîte noire et de l'annoter.
 
 ## Prérequis
 
@@ -54,7 +54,7 @@ Pour ouvrir le projet dans Visual Studio, ouvrez `MyBreadboard.sln`, puis lancez
 | `Ctrl+O` | Ouvrir un schéma |
 | `Ctrl+S` | Enregistrer le schéma |
 | `W` | Activer ou désactiver le mode fil |
-| `Échap` | Quitter le mode fil |
+| `Échap` | Quitter le mode fil (si mode fil activé) |
 | `Espace` | Faire pivoter l’objet sélectionné de 90° |
 | `Suppr` | Supprimer l’objet sélectionné |
 
