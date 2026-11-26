@@ -138,7 +138,7 @@
                 <Button Style="{StaticResource PaletteButtonStyle}" Tag="Bouton poussoir" Click="AddComponentButton_Click" ToolTip="Bouton poussoir">
                     <StackPanel HorizontalAlignment="Center">
                         <Canvas Width="86" Height="42">
-                            <Path Data="M2,12 H16 M70,12 H84 M2,32 H16 M70,32 H84 M16,4 H70 V40 H16 Z M31,12 L42,23 M55,32 L44,21 M31,12 V17 M55,27 V32" Stroke="Black" StrokeThickness="4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent" />
+                            <Path Data="M2,12 H20 M66,12 H84 M2,32 H20 M66,32 H84 M13,6 H72 V36 H13 Z M20,12 L35,32 M50,12 L66,32" Stroke="Black" StrokeThickness="4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Fill="Transparent" />
                         </Canvas>
                         <TextBlock Text="Bouton poussoir" TextWrapping="Wrap" TextAlignment="Center" FontSize="11" />
                     </StackPanel>
