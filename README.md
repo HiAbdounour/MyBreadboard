@@ -8,7 +8,7 @@ MyBreadboard est un prototype fonctionnel destiné au dessin de schémas électr
 
 ### Fonctionnalités disponibles
 
-- Ajouter des symboles : les symboles actuellement supportés sont : générateurs de tension et de courant, résistance, résistance variable, moteur, interrupteur, diode, LED, bouton poussoir et annotation.
+- Ajouter des symboles : les symboles actuellement supportés sont : générateurs de tension et de courant, résistance, résistance variable, moteur, interrupteur, diode, LED, bouton poussoir, potentiomètre, cellule photovoltaïque et annotation.
 - Sélectionner les objets, les déplacer sur la feuille et supprimer l’objet sélectionné via le menu contextuel ou la touche **Suppr**.
 - Faire pivoter le composant sélectionné de 90° avec **Espace**.
 - Créer des fils horizontaux ou verticaux avec le bouton Fil ou la touche **W** ; quitter le mode fil avec **Échap** ou **W**.
